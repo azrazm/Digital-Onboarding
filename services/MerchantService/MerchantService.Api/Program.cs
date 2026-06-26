@@ -1,22 +1,27 @@
+using MerchantService.Application.Interfaces;
+using MerchantService.Infrastructure.Repositories;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Omogućava korištenje controller-based endpointa.
 builder.Services.AddControllers();
+var merchantsJsonPath = Path.GetFullPath(
+    Path.Combine(
+        builder.Environment.ContentRootPath,
+        "..",
+        "MerchantService.Infrastructure",
+        "MockData",
+        "merchants.json"));
 
-// Generiše OpenAPI dokument iz controller ruta.
+builder.Services.AddScoped<IMerchantRepository>(
+    _ => new JsonMerchantRepository(merchantsJsonPath));
+
 builder.Services.AddOpenApi();
 
 var app = builder.Build();
 
-// Swagger dokumentacija je dostupna samo u Development okruženju.
 if (app.Environment.IsDevelopment())
 {
-    // OpenAPI JSON bit će dostupan na:
-    // /openapi/v1.json
     app.MapOpenApi();
-
-    // Swagger UI bit će dostupan na:
-    // /swagger
     app.UseSwaggerUI(options =>
     {
         options.SwaggerEndpoint(

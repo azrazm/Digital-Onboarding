@@ -1,0 +1,53 @@
+[
+  {
+    "id": "7d05319f-7b89-4e99-9fab-a3a83961e74d",
+    "merchantName": "Monri Payments d.o.o.",
+    "merchantVat": "27746883608",
+    "merchantCountry": "HR",
+    "serviceCountry": "HR",
+    "addressAndPostalCode": "Bani 75, 10010 Zagreb",
+    "industryCategory1": "Finance",
+    "industryCategory2": "Banking",
+    "industryCategory3": "Retail Banking",
+    "merchantWebsite": "https://monri.hr",
+    "merchantGroupName": "Payten",
+    "merchantType": "B2B",
+    "legalEntityIdentificationCode": "549300MONRI0000HR01",
+    "yearlyRevenueInEur": "10.000.000 \u2013 50.000.000 EUR",
+    "contacts": []
+  },
+  {
+    "id": "94f74511-2648-47c4-8529-42cf14e80120",
+    "merchantName": "MonriCroatia",
+    "merchantVat": "12345678901",
+    "merchantCountry": "HR",
+    "serviceCountry": null,
+    "addressAndPostalCode": "Ilica 10, 10000 Zagreb",
+    "industryCategory1": "Retail/FMCG",
+    "industryCategory2": "Supermarkets",
+    "industryCategory3": "General Supermarket",
+    "merchantWebsite": "https://novatrgovina.hr",
+    "merchantGroupName": null,
+    "merchantType": "B2C",
+    "legalEntityIdentificationCode": null,
+    "yearlyRevenueInEur": "1.000.000 \u2013 5.000.000 EUR",
+    "contacts": []
+  },
+  {
+    "id": "a59dc7fa-0e25-4bd0-813b-a42dc121cf5c",
+    "merchantName": "Test firma",
+    "merchantVat": "98765432109",
+    "merchantCountry": "HR",
+    "serviceCountry": "BA",
+    "addressAndPostalCode": "Nova testna adresa 15, Zagreb",
+    "industryCategory1": "Retail",
+    "industryCategory2": "Online retail",
+    "industryCategory3": "Electronics",
+    "merchantWebsite": "https://test-merchant.hr",
+    "merchantGroupName": null,
+    "merchantType": "B2C",
+    "legalEntityIdentificationCode": null,
+    "yearlyRevenueInEur": "1.000.000 \u2013 5.000.000 EUR",
+    "contacts": []
+  }
+]
