@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/services/" />
+  <Folder Name="/services/MerchantService/">
+    <Project Path="services/MerchantService/MerchantService.Api/MerchantService.Api.csproj" />
+    <Project Path="services/MerchantService/MerchantService.Application/MerchantService.Application.csproj" />
+    <Project Path="services/MerchantService/MerchantService.Domain/MerchantService.Domain.csproj" />
+    <Project Path="services/MerchantService/MerchantService.Infrastructure/MerchantService.Infrastructure.csproj" />
+  </Folder>
+</Solution>

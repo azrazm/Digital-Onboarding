@@ -1,0 +1,592 @@
+openapi: 3.0.3
+
+info:
+  title: Merchant Service API
+  description: >
+    API za pretragu i upravljanje podacima o merchantima
+    i njihovim kontakt osobama.
+  version: 1.0.0
+
+servers:
+  - url: https://virtserver.swaggerhub.com/mon-7f4/merchant-service-api/1.0.0
+    description: SwaggerHub API Auto Mocking
+
+  - url: http://localhost:5000
+    description: Lokalno razvojno okruženje
+
+tags:
+  - name: Merchants
+    description: Operacije nad merchantima
+
+paths:
+  /api/v1/merchants/search:
+    get:
+      tags:
+        - Merchants
+      summary: Pretraži merchante
+      description: >
+        Pretražuje postojeće merchante prema nazivu firme,
+        OIB-u, JIB-u ili drugom poreznom identifikacijskom broju.
+      operationId: searchMerchants
+
+      parameters:
+        - name: query
+          in: query
+          required: true
+          description: Naziv firme ili porezni identifikacijski broj.
+          schema:
+            type: string
+            minLength: 2
+          example: Monri
+
+        - name: country
+          in: query
+          required: true
+          description: >
+            ISO kod države registracije u kojoj se pretražuju merchanti.
+            Vrijednost se prenosi iz prvog koraka onboarding procesa.
+          schema:
+            type: string
+            minLength: 2
+            maxLength: 2
+          example: HR
+
+      responses:
+        "200":
+          description: Pretraga je uspješno izvršena.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MerchantSearchResponse"
+              example:
+                items:
+                  - id: "7d05319f-7b89-4e99-9fab-a3a83961e74d"
+                    merchantName: "Monri Payments d.o.o."
+                    merchantVat: "27746883608"
+                    merchantCountry: "HR"
+                    addressAndPostalCode: "Bani 75, 10010 Zagreb"
+                totalCount: 1
+
+        "400":
+          description: Neispravni parametri pretrage.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              example:
+                status: 400
+                message: "Parametar query mora sadržavati najmanje 2 znaka."
+                traceId: null
+
+        "500":
+          description: Interna greška Merchant Servicea.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /api/v1/merchants:
+    post:
+      tags:
+        - Merchants
+      summary: Kreiraj novog merchanta
+      description: >
+        Kreira novog merchanta kada firma nije pronađena među
+        postojećim merchantima. Podaci dolaze iz onboarding prijave.
+      operationId: createMerchant
+
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateMerchantRequest"
+            example:
+              merchantName: "Nova trgovina d.o.o."
+              merchantVat: "12345678901"
+              merchantCountry: "HR"
+              serviceCountry: "HR"
+              addressAndPostalCode: "Ilica 10, 10000 Zagreb"
+              industryCategory1: "Retail/FMCG"
+              industryCategory2: "Supermarkets"
+              industryCategory3: "General Supermarket"
+              merchantWebsite: "https://novatrgovina.hr"
+              merchantGroupName: null
+              merchantType: "B2C"
+              legalEntityIdentificationCode: null
+              yearlyRevenueInEur: "1.000.000 – 5.000.000 EUR"
+
+      responses:
+        "201":
+          description: Merchant je uspješno kreiran.
+          headers:
+            Location:
+              description: URL kreiranog merchanta.
+              schema:
+                type: string
+                example: "/api/v1/merchants/13aa519f-2345-4e99-9fab-a3a83961e999"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MerchantDetails"
+              example:
+                id: "13aa519f-2345-4e99-9fab-a3a83961e999"
+                merchantName: "Nova trgovina d.o.o."
+                merchantVat: "12345678901"
+                merchantCountry: "HR"
+                serviceCountry: "HR"
+                addressAndPostalCode: "Ilica 10, 10000 Zagreb"
+                industryCategory1: "Retail/FMCG"
+                industryCategory2: "Supermarkets"
+                industryCategory3: "General Supermarket"
+                merchantWebsite: "https://novatrgovina.hr"
+                merchantGroupName: null
+                merchantType: "B2C"
+                legalEntityIdentificationCode: null
+                yearlyRevenueInEur: "1.000.000 – 5.000.000 EUR"
+
+        "400":
+          description: Poslani podaci nisu ispravni.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+        "409":
+          description: Merchant s istim poreznim identifikacijskim brojem već postoji.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              example:
+                status: 409
+                message: "Merchant s istim poreznim identifikacijskim brojem već postoji."
+                traceId: null
+
+        "500":
+          description: Interna greška Merchant Servicea.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /api/v1/merchants/{merchantId}:
+    get:
+      tags:
+        - Merchants
+      summary: Dohvati podatke o merchantu
+      description: >
+        Dohvaća potpune podatke o jednom merchantu na osnovu
+        njegovog internog identifikatora.
+      operationId: getMerchantById
+
+      parameters:
+        - $ref: "#/components/parameters/MerchantId"
+
+      responses:
+        "200":
+          description: Merchant je uspješno pronađen.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MerchantDetails"
+              example:
+                id: "7d05319f-7b89-4e99-9fab-a3a83961e74d"
+                merchantName: "Monri Payments d.o.o."
+                merchantVat: "27746883608"
+                merchantCountry: "HR"
+                serviceCountry: "HR"
+                addressAndPostalCode: "Bani 75, 10010 Zagreb"
+                industryCategory1: "Finance"
+                industryCategory2: "Banking"
+                industryCategory3: "Retail Banking"
+                merchantWebsite: "https://monri.hr"
+                merchantGroupName: "Payten"
+                merchantType: "B2B"
+                legalEntityIdentificationCode: "549300MONRI0000HR01"
+                yearlyRevenueInEur: "10.000.000 – 50.000.000 EUR"
+
+        "400":
+          description: Merchant ID nije u ispravnom UUID formatu.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+        "404":
+          description: Merchant nije pronađen.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+        "500":
+          description: Interna greška Merchant Servicea.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+    put:
+      tags:
+        - Merchants
+      summary: Ažuriraj podatke o merchantu
+      description: >
+        Ažurira podatke postojećeg merchanta na osnovu podataka
+        prikupljenih tokom onboarding procesa.
+      operationId: updateMerchant
+
+      parameters:
+        - $ref: "#/components/parameters/MerchantId"
+
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateMerchantRequest"
+            example:
+              merchantName: "Monri Payments d.o.o."
+              merchantVat: "27746883608"
+              merchantCountry: "HR"
+              serviceCountry: "HR"
+              addressAndPostalCode: "Nova adresa 15, 10000 Zagreb"
+              industryCategory1: "Finance"
+              industryCategory2: "Banking"
+              industryCategory3: "Retail Banking"
+              merchantWebsite: "https://monri.hr"
+              merchantGroupName: "Payten"
+              merchantType: "B2B"
+              legalEntityIdentificationCode: "549300MONRI0000HR01"
+              yearlyRevenueInEur: "10.000.000 – 50.000.000 EUR"
+
+      responses:
+        "200":
+          description: Merchant je uspješno ažuriran.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MerchantDetails"
+              example:
+                id: "7d05319f-7b89-4e99-9fab-a3a83961e74d"
+                merchantName: "Monri Payments d.o.o."
+                merchantVat: "27746883608"
+                merchantCountry: "HR"
+                serviceCountry: "HR"
+                addressAndPostalCode: "Nova adresa 15, 10000 Zagreb"
+                industryCategory1: "Finance"
+                industryCategory2: "Banking"
+                industryCategory3: "Retail Banking"
+                merchantWebsite: "https://monri.hr"
+                merchantGroupName: "Payten"
+                merchantType: "B2B"
+                legalEntityIdentificationCode: "549300MONRI0000HR01"
+                yearlyRevenueInEur: "10.000.000 – 50.000.000 EUR"
+
+        "400":
+          description: Merchant ID ili poslani podaci nisu ispravni.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+        "404":
+          description: Merchant nije pronađen.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+        "409":
+          description: Porezni identifikacijski broj pripada drugom merchantu.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+        "500":
+          description: Interna greška Merchant Servicea.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+components:
+  parameters:
+    MerchantId:
+      name: merchantId
+      in: path
+      required: true
+      description: Interni identifikator merchanta.
+      schema:
+        type: string
+        format: uuid
+      example: "7d05319f-7b89-4e99-9fab-a3a83961e74d"
+
+  schemas:
+    CreateMerchantRequest:
+      type: object
+      required:
+        - merchantName
+        - merchantVat
+        - merchantCountry
+        - addressAndPostalCode
+        - industryCategory1
+        - industryCategory2
+        - yearlyRevenueInEur
+
+      properties:
+        merchantName:
+          type: string
+          description: "Excel field: Merchant Name"
+          example: "Nova trgovina d.o.o."
+
+        merchantVat:
+          type: string
+          description: "Excel field: Merchant VAT"
+          example: "12345678901"
+
+        merchantCountry:
+          type: string
+          minLength: 2
+          maxLength: 2
+          description: "Excel field: Merchant Country"
+          example: "HR"
+
+        serviceCountry:
+          type: string
+          nullable: true
+          minLength: 2
+          maxLength: 2
+          description: "Excel field: Service Country"
+          example: "HR"
+
+        addressAndPostalCode:
+          type: string
+          description: "Excel field: Adress and Postal code"
+          example: "Ilica 10, 10000 Zagreb"
+
+        industryCategory1:
+          type: string
+          description: "Excel field: Industry Category 1"
+          example: "Retail/FMCG"
+
+        industryCategory2:
+          type: string
+          description: "Excel field: Industry Category 2"
+          example: "Supermarkets"
+
+        industryCategory3:
+          type: string
+          nullable: true
+          description: "Excel field: Industry Category 3"
+          example: "General Supermarket"
+
+        merchantWebsite:
+          type: string
+          format: uri
+          nullable: true
+          description: "Excel field: Merchant Website"
+          example: "https://novatrgovina.hr"
+
+        merchantGroupName:
+          type: string
+          nullable: true
+          description: "Excel field: Merchant Group name"
+          example: null
+
+        merchantType:
+          type: string
+          nullable: true
+          description: "Excel field: Merchant Type"
+          example: "B2C"
+
+        legalEntityIdentificationCode:
+          type: string
+          nullable: true
+          description: "Excel field: Legal Entity Identification Code"
+          example: null
+
+        yearlyRevenueInEur:
+          type: string
+          description: "Excel field: Yearly Revenue in EUR"
+          example: "1.000.000 – 5.000.000 EUR"
+
+    UpdateMerchantRequest:
+      description: Podaci za ažuriranje postojećeg merchanta.
+      allOf:
+        - $ref: "#/components/schemas/CreateMerchantRequest"
+
+    MerchantSearchItem:
+      type: object
+      required:
+        - id
+        - merchantName
+        - merchantVat
+        - merchantCountry
+
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Interni identifikator merchanta.
+          example: "7d05319f-7b89-4e99-9fab-a3a83961e74d"
+
+        merchantName:
+          type: string
+          description: Naziv firme.
+          example: "Monri Payments d.o.o."
+
+        merchantVat:
+          type: string
+          description: OIB, JIB ili drugi porezni identifikacijski broj.
+          example: "27746883608"
+
+        merchantCountry:
+          type: string
+          minLength: 2
+          maxLength: 2
+          description: ISO kod države registracije.
+          example: "HR"
+
+        addressAndPostalCode:
+          type: string
+          nullable: true
+          description: Adresa i poštanski broj.
+          example: "Bani 75, 10010 Zagreb"
+
+    MerchantSearchResponse:
+      type: object
+      required:
+        - items
+        - totalCount
+
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/MerchantSearchItem"
+
+        totalCount:
+          type: integer
+          minimum: 0
+          description: Ukupan broj pronađenih rezultata.
+          example: 1
+
+    MerchantDetails:
+      type: object
+      required:
+        - id
+        - merchantName
+        - merchantVat
+        - merchantCountry
+        - addressAndPostalCode
+        - industryCategory1
+        - industryCategory2
+        - yearlyRevenueInEur
+
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Interni identifikator merchanta.
+          example: "7d05319f-7b89-4e99-9fab-a3a83961e74d"
+
+        merchantName:
+          type: string
+          description: Naziv firme.
+          example: "Monri Payments d.o.o."
+
+        merchantVat:
+          type: string
+          description: OIB, JIB ili drugi porezni identifikacijski broj.
+          example: "27746883608"
+
+        merchantCountry:
+          type: string
+          minLength: 2
+          maxLength: 2
+          description: ISO kod države registracije.
+          example: "HR"
+
+        serviceCountry:
+          type: string
+          nullable: true
+          minLength: 2
+          maxLength: 2
+          description: ISO kod države pružanja usluge.
+          example: "HR"
+
+        addressAndPostalCode:
+          type: string
+          description: Adresa i poštanski broj.
+          example: "Bani 75, 10010 Zagreb"
+
+        industryCategory1:
+          type: string
+          description: Glavna djelatnost.
+          example: "Finance"
+
+        industryCategory2:
+          type: string
+          description: Područje djelatnosti.
+          example: "Banking"
+
+        industryCategory3:
+          type: string
+          nullable: true
+          description: Detaljnija djelatnost.
+          example: "Retail Banking"
+
+        merchantWebsite:
+          type: string
+          format: uri
+          nullable: true
+          description: Web-stranica firme.
+          example: "https://monri.hr"
+
+        merchantGroupName:
+          type: string
+          nullable: true
+          description: Naziv grupacije kojoj firma pripada.
+          example: "Payten"
+
+        merchantType:
+          type: string
+          nullable: true
+          description: Vrsta poslovanja.
+          example: "B2B"
+
+        legalEntityIdentificationCode:
+          type: string
+          nullable: true
+          description: Identifikacijski kod pravne osobe.
+          example: "549300MONRI0000HR01"
+
+        yearlyRevenueInEur:
+          type: string
+          description: Raspon godišnjeg prihoda u EUR.
+          example: "10.000.000 – 50.000.000 EUR"
+
+    ErrorResponse:
+      type: object
+      required:
+        - status
+        - message
+
+      properties:
+        status:
+          type: integer
+          description: HTTP status kod.
+          example: 400
+
+        message:
+          type: string
+          description: Opis nastale greške.
+          example: "Poslani podaci nisu ispravni."
+
+        traceId:
+          type: string
+          nullable: true
+          description: Identifikator zahtjeva za praćenje greške.
+          example: null
