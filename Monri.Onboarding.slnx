@@ -6,4 +6,10 @@
     <Project Path="services/MerchantService/MerchantService.Domain/MerchantService.Domain.csproj" />
     <Project Path="services/MerchantService/MerchantService.Infrastructure/MerchantService.Infrastructure.csproj" />
   </Folder>
+  <Folder Name="/services/ProductService/">
+    <Project Path="services/ProductService/ProductService.Api/ProductService.Api.csproj" />
+    <Project Path="services/ProductService/ProductService.Application/ProductService.Application.csproj" />
+    <Project Path="services/ProductService/ProductService.Domain/ProductService.Domain.csproj" />
+    <Project Path="services/ProductService/ProductService.Infrastructure/ProductService.Infrastructure.csproj" />
+  </Folder>
 </Solution>
