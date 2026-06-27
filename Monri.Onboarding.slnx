@@ -6,6 +6,12 @@
     <Project Path="services/MerchantService/MerchantService.Domain/MerchantService.Domain.csproj" />
     <Project Path="services/MerchantService/MerchantService.Infrastructure/MerchantService.Infrastructure.csproj" />
   </Folder>
+  <Folder Name="/services/OnboardingApplicationService/">
+    <Project Path="services/OnboardingApplicationService/OnboardingApplicationService.Api/OnboardingApplicationService.Api.csproj" />
+    <Project Path="services/OnboardingApplicationService/OnboardingApplicationService.Application/OnboardingApplicationService.Application.csproj" />
+    <Project Path="services/OnboardingApplicationService/OnboardingApplicationService.Domain/OnboardingApplicationService.Domain.csproj" />
+    <Project Path="services/OnboardingApplicationService/OnboardingApplicationService.Infrastructure/OnboardingApplicationService.Infrastructure.csproj" />
+  </Folder>
   <Folder Name="/services/ProductService/">
     <Project Path="services/ProductService/ProductService.Api/ProductService.Api.csproj" />
     <Project Path="services/ProductService/ProductService.Application/ProductService.Application.csproj" />
