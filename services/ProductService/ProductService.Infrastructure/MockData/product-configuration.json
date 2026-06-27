@@ -126,25 +126,13 @@
   ],
   "requirements": [
     {
-      "requirementCode": "MONTHLY_TRANSACTION_VOLUME",
-      "label": "Expected monthly transaction volume",
-      "description": "Expected monthly transaction volume for selected products.",
-      "fieldType": "SingleSelect",
+      "requirementCode": "YEARLY_CARD_TRX_NUMBER",
+      "submitFieldName": "yearlyCardTransactionNumber",
+      "label": "Yearly Card TRX Number",
+      "description": "Expected yearly number of card transactions.",
+      "fieldType": "Number",
       "isRequired": true,
-      "options": [
-        {
-          "code": "LOW",
-          "label": "Up to 10,000 EUR"
-        },
-        {
-          "code": "MEDIUM",
-          "label": "10,000 – 50,000 EUR"
-        },
-        {
-          "code": "HIGH",
-          "label": "More than 50,000 EUR"
-        }
-      ],
+      "options": null,
       "dependsOn": {
         "productLineCodes": [
           "WEBPAY",
@@ -156,25 +144,13 @@
       "displayOrder": 1
     },
     {
-      "requirementCode": "SUPPORTED_CURRENCIES",
-      "label": "Supported currencies",
-      "description": "Currencies required for the selected product setup.",
-      "fieldType": "MultiSelect",
+      "requirementCode": "YEARLY_CARD_TRANSACTION_VOLUME_IN_EUR",
+      "submitFieldName": "yearlyCardTransactionVolumeInEur",
+      "label": "Yearly Card Transaction Volume in EUR",
+      "description": "Expected yearly card transaction volume in EUR.",
+      "fieldType": "Number",
       "isRequired": true,
-      "options": [
-        {
-          "code": "EUR",
-          "label": "EUR"
-        },
-        {
-          "code": "USD",
-          "label": "USD"
-        },
-        {
-          "code": "BAM",
-          "label": "BAM"
-        }
-      ],
+      "options": null,
       "dependsOn": {
         "productLineCodes": [
           "WEBPAY",
@@ -186,15 +162,22 @@
       "displayOrder": 2
     },
     {
-      "requirementCode": "WEBSITE_URL",
-      "label": "Website URL",
-      "description": "Website URL used for online payments.",
+      "requirementCode": "PARTNERS_AND_DISTRIBUTORS",
+      "submitFieldName": "partnersAndDistributors",
+      "label": "Partners and Distributors",
+      "description": "Information about partners and distributors related to the merchant setup.",
       "fieldType": "Text",
-      "isRequired": true,
+      "isRequired": false,
       "options": null,
       "dependsOn": {
         "productLineCodes": [
-          "WEBPAY"
+          "WEBPAY",
+          "WSPAY",
+          "REMARIS",
+          "SMART",
+          "THOR",
+          "START",
+          "ATM"
         ],
         "productCodes": [],
         "attributeCodes": []
@@ -202,36 +185,162 @@
       "displayOrder": 3
     },
     {
-      "requirementCode": "TOKENIZATION_USAGE",
-      "label": "Tokenization usage",
-      "description": "Describe how tokenization will be used.",
+      "requirementCode": "INTEGRATORS_AND_SYSTEM_PROVIDERS",
+      "submitFieldName": "integratorsAndSystemProviders",
+      "label": "Integrators and System Providers",
+      "description": "Information about integrators or system providers involved in implementation.",
       "fieldType": "Text",
-      "isRequired": true,
+      "isRequired": false,
       "options": null,
       "dependsOn": {
-        "productLineCodes": [],
+        "productLineCodes": [
+          "WEBPAY",
+          "WSPAY",
+          "REMARIS",
+          "SMART",
+          "THOR"
+        ],
         "productCodes": [],
-        "attributeCodes": [
-          "TOKENIZATION"
-        ]
+        "attributeCodes": []
       },
       "displayOrder": 4
     },
     {
-      "requirementCode": "ATM_LOCATION_COUNT",
-      "label": "Number of ATM locations",
-      "description": "Number of ATM locations planned for onboarding.",
+      "requirementCode": "NUMBER_OF_LOCATIONS",
+      "submitFieldName": "numberOfLocations",
+      "label": "Number of Locations",
+      "description": "Number of merchant locations included in onboarding.",
       "fieldType": "Number",
       "isRequired": true,
       "options": null,
       "dependsOn": {
         "productLineCodes": [
+          "REMARIS",
+          "SMART",
+          "THOR",
+          "START",
           "ATM"
         ],
         "productCodes": [],
         "attributeCodes": []
       },
       "displayOrder": 5
+    },
+    {
+      "requirementCode": "NUMBER_OF_DEVICES",
+      "submitFieldName": "numberOfDevices",
+      "label": "Number of Devices",
+      "description": "Number of devices required for selected products.",
+      "fieldType": "Number",
+      "isRequired": true,
+      "options": null,
+      "dependsOn": {
+        "productLineCodes": [
+          "SMART",
+          "ATM"
+        ],
+        "productCodes": [],
+        "attributeCodes": []
+      },
+      "displayOrder": 6
+    },
+    {
+      "requirementCode": "NUMBER_OF_LICENSES_PAID",
+      "submitFieldName": "numberOfLicensesPaid",
+      "label": "Number of Licenses - Paid",
+      "description": "Number of paid licenses required for selected software products.",
+      "fieldType": "Number",
+      "isRequired": false,
+      "options": null,
+      "dependsOn": {
+        "productLineCodes": [
+          "REMARIS",
+          "THOR",
+          "START"
+        ],
+        "productCodes": [],
+        "attributeCodes": []
+      },
+      "displayOrder": 7
+    },
+    {
+      "requirementCode": "NUMBER_OF_LICENSES_TOTAL",
+      "submitFieldName": "numberOfLicensesTotal",
+      "label": "Number of Licenses - Total",
+      "description": "Total number of licenses required for selected software products.",
+      "fieldType": "Number",
+      "isRequired": false,
+      "options": null,
+      "dependsOn": {
+        "productLineCodes": [
+          "REMARIS",
+          "THOR",
+          "START"
+        ],
+        "productCodes": [],
+        "attributeCodes": []
+      },
+      "displayOrder": 8
+    },
+    {
+      "requirementCode": "MODEL_OF_DEVICE_HW",
+      "submitFieldName": "modelOfDeviceHw",
+      "label": "Model of Device (HW)",
+      "description": "Hardware device model required for selected product setup.",
+      "fieldType": "Text",
+      "isRequired": false,
+      "options": null,
+      "dependsOn": {
+        "productLineCodes": [
+          "SMART",
+          "ATM"
+        ],
+        "productCodes": [],
+        "attributeCodes": []
+      },
+      "displayOrder": 9
+    },
+    {
+      "requirementCode": "MAIN_BANK",
+      "submitFieldName": "mainBank",
+      "label": "Main Bank",
+      "description": "Main bank connected to the merchant onboarding process.",
+      "fieldType": "Text",
+      "isRequired": true,
+      "options": null,
+      "dependsOn": {
+        "productLineCodes": [
+          "WEBPAY",
+          "WSPAY",
+          "ATM"
+        ],
+        "productCodes": [],
+        "attributeCodes": []
+      },
+      "displayOrder": 10
+    },
+    {
+      "requirementCode": "GDPR",
+      "submitFieldName": "gdpr",
+      "label": "GDPR",
+      "description": "GDPR-related confirmation or requirement for selected onboarding setup.",
+      "fieldType": "Boolean",
+      "isRequired": true,
+      "options": null,
+      "dependsOn": {
+        "productLineCodes": [
+          "WEBPAY",
+          "WSPAY",
+          "REMARIS",
+          "SMART",
+          "THOR",
+          "START",
+          "ATM"
+        ],
+        "productCodes": [],
+        "attributeCodes": []
+      },
+      "displayOrder": 11
     }
   ]
 }

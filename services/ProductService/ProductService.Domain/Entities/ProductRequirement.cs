@@ -17,4 +17,5 @@ public class ProductRequirement
     public RequirementDependency DependsOn { get; set; } = new();
 
     public int DisplayOrder { get; set; }
+    public string SubmitFieldName { get; set; } = string.Empty;
 }

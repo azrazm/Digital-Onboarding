@@ -61,7 +61,7 @@ public class ProductsController : ControllerBase
             description = attribute.Description,
             isRequired = attribute.IsRequired,
             displayOrder = attribute.DisplayOrder,
-            status = attribute.Status
+            status = attribute.Status,
         };
     }
 }
