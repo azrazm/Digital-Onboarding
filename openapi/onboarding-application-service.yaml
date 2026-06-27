@@ -1,0 +1,674 @@
+openapi: 3.0.3
+
+info:
+  title: Onboarding Application Service API
+  description: >
+    API za finalno slanje i dohvat onboarding prijava.
+    Ovaj servis ne podržava draft/spasi-kasnije način rada.
+    Frontend šalje kompletnu onboarding prijavu jednom submit rutom.
+  version: 1.0.0
+
+servers:
+  - url: https://virtserver.swaggerhub.com/mon-7f4/onboarding-application-service-api/1.0.0
+    description: SwaggerHub API Auto Mocking
+
+  - url: http://localhost:5002
+    description: Lokalno razvojno okruženje
+
+tags:
+  - name: Onboarding Applications
+    description: Operacije nad onboarding prijavama
+
+paths:
+  /api/v1/onboarding-applications/submit:
+    post:
+      tags:
+        - Onboarding Applications
+      summary: Pošalji onboarding prijavu
+      description: >
+        Prima kompletnu onboarding prijavu nakon što korisnik završi sve korake forme.
+        Ova ruta kreira novu onboarding prijavu bez draft/spasi-kasnije procesa.
+        Podaci uključuju firmu, kontakte, odabrane proizvode, zahtjeve,
+        dokument reference i potvrdu pregleda podataka.
+      operationId: submitOnboardingApplication
+
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SubmitOnboardingApplicationRequest"
+            example:
+              merchant:
+                existingMerchantId: "7d05319f-7b89-4e99-9fab-a3a83961e74d"
+                merchantName: "Monri Payments d.o.o."
+                merchantVat: "27746883608"
+                merchantCountry: "HR"
+                serviceCountry: "HR"
+                addressAndPostalCode: "Bani 75, 10010 Zagreb"
+                industryCategory1: "Finance"
+                industryCategory2: "Banking"
+                industryCategory3: "Retail Banking"
+                merchantWebsite: "https://monri.hr"
+                merchantGroupName: "Payten"
+                merchantType: "B2B"
+                legalEntityIdentificationCode: "549300MONRI0000HR01"
+                yearlyRevenueInEur: "10.000.000 – 50.000.000 EUR"
+
+              contacts:
+                - firstName: "Ana"
+                  lastName: "Anić"
+                  email: "ana.anic@example.com"
+                  phoneNumber: "+385911234567"
+                  position: "Finance Manager"
+                  isDecisionMaker: true
+                  contactType: "Primary"
+                - firstName: "Marko"
+                  lastName: "Marković"
+                  email: "marko.markovic@example.com"
+                  phoneNumber: "+385921234567"
+                  position: "Operations Manager"
+                  isDecisionMaker: false
+                  contactType: "Secondary"
+
+              productSelections:
+                - productLineCode: "WEBPAY"
+                  productCode: "WEBPAY_STANDARD"
+                  attributeCodes:
+                    - "ONLINE_CARD_PAYMENTS"
+                    - "TOKENIZATION"
+                - productLineCode: "ATM"
+                  productCode: null
+                  attributeCodes: []
+
+              requirements:
+                yearlyCardTransactionNumber: 12000
+                yearlyCardTransactionVolumeInEur: 50000
+                partnersAndDistributors: "Partner A, Partner B"
+                integratorsAndSystemProviders: "Integrator X"
+                numberOfLocations: 5
+                numberOfDevices: 20
+                numberOfLicensesPaid: 10
+                numberOfLicensesTotal: 15
+                modelOfDeviceHw: "PAX A920"
+                mainBank: "Zagrebačka banka"
+                gdpr: true
+
+              documents:
+                - documentType: "COMPANY_REGISTRATION"
+                  fileName: "company-registration.pdf"
+                  documentReference: "mock-document-001"
+
+              confirmedReview: true
+              submittedByEmail: "user@example.com"
+
+      responses:
+        "201":
+          description: Onboarding prijava je uspješno kreirana.
+          headers:
+            Location:
+              description: URL kreirane onboarding prijave.
+              schema:
+                type: string
+                example: "/api/v1/onboarding-applications/5f3f1f6d-1b82-4c47-9d42-2ab78f1c0001"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OnboardingApplicationDetails"
+              example:
+                applicationId: "5f3f1f6d-1b82-4c47-9d42-2ab78f1c0001"
+                applicationNumber: "ONB-2026-000001"
+                submittedAt: "2026-06-27T12:30:00Z"
+                lastUpdatedAt: "2026-06-27T12:30:00Z"
+                submittedByEmail: "user@example.com"
+                confirmedReview: true
+                merchant:
+                  existingMerchantId: "7d05319f-7b89-4e99-9fab-a3a83961e74d"
+                  merchantName: "Monri Payments d.o.o."
+                  merchantVat: "27746883608"
+                  merchantCountry: "HR"
+                  serviceCountry: "HR"
+                  addressAndPostalCode: "Bani 75, 10010 Zagreb"
+                  industryCategory1: "Finance"
+                  industryCategory2: "Banking"
+                  industryCategory3: "Retail Banking"
+                  merchantWebsite: "https://monri.hr"
+                  merchantGroupName: "Payten"
+                  merchantType: "B2B"
+                  legalEntityIdentificationCode: "549300MONRI0000HR01"
+                  yearlyRevenueInEur: "10.000.000 – 50.000.000 EUR"
+                contacts:
+                  - firstName: "Ana"
+                    lastName: "Anić"
+                    email: "ana.anic@example.com"
+                    phoneNumber: "+385911234567"
+                    position: "Finance Manager"
+                    isDecisionMaker: true
+                    contactType: "Primary"
+                productSelections:
+                  - productLineCode: "WEBPAY"
+                    productCode: "WEBPAY_STANDARD"
+                    attributeCodes:
+                      - "ONLINE_CARD_PAYMENTS"
+                      - "TOKENIZATION"
+                requirements:
+                  yearlyCardTransactionNumber: 12000
+                  yearlyCardTransactionVolumeInEur: 50000
+                  partnersAndDistributors: "Partner A, Partner B"
+                  integratorsAndSystemProviders: "Integrator X"
+                  numberOfLocations: 5
+                  numberOfDevices: 20
+                  numberOfLicensesPaid: 10
+                  numberOfLicensesTotal: 15
+                  modelOfDeviceHw: "PAX A920"
+                  mainBank: "Zagrebačka banka"
+                  gdpr: true
+                documents:
+                  - documentType: "COMPANY_REGISTRATION"
+                    fileName: "company-registration.pdf"
+                    documentReference: "mock-document-001"
+
+        "400":
+          description: Poslani podaci nisu ispravni.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+        "409":
+          description: Onboarding prijava nije validna zbog poslovnog pravila.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              example:
+                status: 409
+                message: "Korisnik mora potvrditi da je pregledao podatke prije slanja."
+                traceId: null
+
+        "500":
+          description: Interna greška Onboarding Application Servicea.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /api/v1/onboarding-applications/{applicationId}:
+    get:
+      tags:
+        - Onboarding Applications
+      summary: Dohvati onboarding prijavu
+      description: >
+        Dohvaća kompletnu onboarding prijavu na osnovu internog identifikatora.
+        Koristi se nakon submit-a za pregled poslane prijave.
+      operationId: getOnboardingApplicationById
+
+      parameters:
+        - $ref: "#/components/parameters/ApplicationId"
+
+      responses:
+        "200":
+          description: Onboarding prijava je uspješno pronađena.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OnboardingApplicationDetails"
+
+        "400":
+          description: Application ID nije u ispravnom UUID formatu.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+        "404":
+          description: Onboarding prijava nije pronađena.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+        "500":
+          description: Interna greška Onboarding Application Servicea.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+components:
+  parameters:
+    ApplicationId:
+      name: applicationId
+      in: path
+      required: true
+      description: Interni identifikator onboarding prijave.
+      schema:
+        type: string
+        format: uuid
+      example: "5f3f1f6d-1b82-4c47-9d42-2ab78f1c0001"
+
+  schemas:
+    SubmitOnboardingApplicationRequest:
+      type: object
+      required:
+        - merchant
+        - contacts
+        - productSelections
+        - requirements
+        - confirmedReview
+
+      properties:
+        merchant:
+          $ref: "#/components/schemas/SubmittedMerchant"
+
+        contacts:
+          type: array
+          minItems: 1
+          maxItems: 2
+          description: >
+            Finalna lista kontakt osoba. Očekuje se jedan primarni kontakt
+            i opcionalno jedan sekundarni kontakt.
+          items:
+            $ref: "#/components/schemas/SubmittedContact"
+
+        productSelections:
+          type: array
+          minItems: 1
+          description: Odabrani product line-ovi, proizvodi i atributi.
+          items:
+            $ref: "#/components/schemas/SubmittedProductSelection"
+
+        requirements:
+          $ref: "#/components/schemas/SubmittedRequirements"
+
+        documents:
+          type: array
+          nullable: true
+          description: >
+            Opcionalne reference na dokumente. U kasnijoj fazi ove reference
+            mogu dolaziti iz Document Servicea ili DMS-a.
+          items:
+            $ref: "#/components/schemas/SubmittedDocument"
+
+        confirmedReview:
+          type: boolean
+          description: Potvrda da je korisnik pregledao podatke prije slanja.
+          example: true
+
+        submittedByEmail:
+          type: string
+          format: email
+          nullable: true
+          description: Email osobe koja je poslala onboarding prijavu.
+          example: "user@example.com"
+
+    SubmittedMerchant:
+      type: object
+      required:
+        - merchantName
+        - merchantVat
+        - merchantCountry
+        - addressAndPostalCode
+        - industryCategory1
+        - industryCategory2
+        - yearlyRevenueInEur
+
+      properties:
+        existingMerchantId:
+          type: string
+          format: uuid
+          nullable: true
+          description: >
+            ID postojećeg merchanta ako je korisnik odabrao firmu iz pretrage.
+            Može biti null ako se prijavljuje nova firma.
+          example: "7d05319f-7b89-4e99-9fab-a3a83961e74d"
+
+        merchantName:
+          type: string
+          description: "Excel field: Merchant Name"
+          example: "Monri Payments d.o.o."
+
+        merchantVat:
+          type: string
+          description: "Excel field: Merchant VAT"
+          example: "27746883608"
+
+        merchantCountry:
+          type: string
+          minLength: 2
+          maxLength: 2
+          description: "Excel field: Merchant Country"
+          example: "HR"
+
+        serviceCountry:
+          type: string
+          nullable: true
+          minLength: 2
+          maxLength: 2
+          description: "Excel field: Service Country"
+          example: "HR"
+
+        addressAndPostalCode:
+          type: string
+          description: "Excel field: Adress and Postal code"
+          example: "Bani 75, 10010 Zagreb"
+
+        industryCategory1:
+          type: string
+          description: "Excel field: Industry Category 1"
+          example: "Finance"
+
+        industryCategory2:
+          type: string
+          description: "Excel field: Industry Category 2"
+          example: "Banking"
+
+        industryCategory3:
+          type: string
+          nullable: true
+          description: "Excel field: Industry Category 3"
+          example: "Retail Banking"
+
+        merchantWebsite:
+          type: string
+          format: uri
+          nullable: true
+          description: "Excel field: Merchant Website"
+          example: "https://monri.hr"
+
+        merchantGroupName:
+          type: string
+          nullable: true
+          description: "Excel field: Merchant Group name"
+          example: "Payten"
+
+        merchantType:
+          type: string
+          nullable: true
+          description: "Excel field: Merchant Type"
+          example: "B2B"
+
+        legalEntityIdentificationCode:
+          type: string
+          nullable: true
+          description: "Excel field: Legal Entity Identification Code"
+          example: "549300MONRI0000HR01"
+
+        yearlyRevenueInEur:
+          type: string
+          description: "Excel field: Yearly Revenue in EUR"
+          example: "10.000.000 – 50.000.000 EUR"
+
+    SubmittedContact:
+      type: object
+      required:
+        - firstName
+        - lastName
+        - email
+        - phoneNumber
+        - contactType
+
+      properties:
+        firstName:
+          type: string
+          description: "Excel field: Contact Person Name"
+          example: "Ana"
+
+        lastName:
+          type: string
+          description: "Excel field: Contact Person Surname"
+          example: "Anić"
+
+        email:
+          type: string
+          format: email
+          description: "Excel field: Contact Person Email"
+          example: "ana.anic@example.com"
+
+        phoneNumber:
+          type: string
+          description: "Excel field: Contact Person Ph.Number"
+          example: "+385911234567"
+
+        position:
+          type: string
+          nullable: true
+          description: "Excel field: Position"
+          example: "Finance Manager"
+
+        isDecisionMaker:
+          type: boolean
+          nullable: true
+          description: "Excel field: Decision Maker"
+          example: true
+
+        contactType:
+          type: string
+          description: Tip kontakt osobe.
+          enum:
+            - Primary
+            - Secondary
+          example: "Primary"
+
+    SubmittedProductSelection:
+      type: object
+      required:
+        - productLineCode
+        - attributeCodes
+
+      properties:
+        productLineCode:
+          type: string
+          description: Odabrani product line.
+          example: "WEBPAY"
+
+        productCode:
+          type: string
+          nullable: true
+          description: >
+            Odabrani proizvod. Može biti null ako product line nema
+            dodatni Product dropdown.
+          example: "WEBPAY_STANDARD"
+
+        attributeCodes:
+          type: array
+          description: >
+            Odabrani atributi proizvoda. Može biti prazna lista ako proizvod
+            nema Product Attributes dropdown.
+          items:
+            type: string
+          example:
+            - "ONLINE_CARD_PAYMENTS"
+            - "TOKENIZATION"
+
+    SubmittedRequirements:
+      type: object
+      description: >
+        Konkretna requirement polja popunjena u onboarding formi.
+        Polja su opcionalna jer zavise od odabranih product line-ova,
+        proizvoda i atributa.
+      properties:
+        yearlyCardTransactionNumber:
+          type: integer
+          nullable: true
+          description: "Excel field: Yearly Card TRX Number"
+          example: 12000
+
+        yearlyCardTransactionVolumeInEur:
+          type: number
+          format: decimal
+          nullable: true
+          description: "Excel field: Yearly Card Transaction Vol. in EUR"
+          example: 50000
+
+        partnersAndDistributors:
+          type: string
+          nullable: true
+          description: "Excel field: Partners and Distributers"
+          example: "Partner A, Partner B"
+
+        integratorsAndSystemProviders:
+          type: string
+          nullable: true
+          description: "Excel field: Integrators and System Providers"
+          example: "Integrator X"
+
+        numberOfLocations:
+          type: integer
+          nullable: true
+          description: "Excel field: Number of Locations"
+          example: 5
+
+        numberOfDevices:
+          type: integer
+          nullable: true
+          description: "Excel field: Number of Devices"
+          example: 20
+
+        numberOfLicensesPaid:
+          type: integer
+          nullable: true
+          description: "Excel field: Number of Licenses - Paid"
+          example: 10
+
+        numberOfLicensesTotal:
+          type: integer
+          nullable: true
+          description: "Excel field: Number of Licenses - Total"
+          example: 15
+
+        modelOfDeviceHw:
+          type: string
+          nullable: true
+          description: "Excel field: Model of Device (HW)"
+          example: "PAX A920"
+
+        mainBank:
+          type: string
+          nullable: true
+          description: "Excel field: Main Bank"
+          example: "Zagrebačka banka"
+
+        gdpr:
+          type: boolean
+          nullable: true
+          description: "Excel field: GDPR"
+          example: true
+
+    SubmittedDocument:
+      type: object
+      required:
+        - documentType
+        - fileName
+
+      properties:
+        documentType:
+          type: string
+          description: Tip dokumenta.
+          example: "COMPANY_REGISTRATION"
+
+        fileName:
+          type: string
+          description: Naziv dokumenta.
+          example: "company-registration.pdf"
+
+        documentReference:
+          type: string
+          nullable: true
+          description: >
+            Referenca na dokument u Document Serviceu, DMS-u ili mock storageu.
+          example: "mock-document-001"
+
+    OnboardingApplicationDetails:
+      type: object
+      required:
+        - applicationId
+        - applicationNumber
+        - submittedAt
+        - lastUpdatedAt
+        - confirmedReview
+        - merchant
+        - contacts
+        - productSelections
+        - requirements
+
+      properties:
+        applicationId:
+          type: string
+          format: uuid
+          description: Interni identifikator onboarding prijave.
+          example: "5f3f1f6d-1b82-4c47-9d42-2ab78f1c0001"
+
+        applicationNumber:
+          type: string
+          description: Korisnički čitljiv broj onboarding prijave.
+          example: "ONB-2026-000001"
+
+        submittedAt:
+          type: string
+          format: date-time
+          description: Vrijeme slanja prijave.
+          example: "2026-06-27T12:30:00Z"
+
+        lastUpdatedAt:
+          type: string
+          format: date-time
+          description: Vrijeme zadnje izmjene prijave.
+          example: "2026-06-27T12:30:00Z"
+
+        submittedByEmail:
+          type: string
+          format: email
+          nullable: true
+          description: Email osobe koja je poslala prijavu.
+          example: "user@example.com"
+
+        confirmedReview:
+          type: boolean
+          description: Potvrda da je korisnik pregledao podatke prije slanja.
+          example: true
+
+        merchant:
+          $ref: "#/components/schemas/SubmittedMerchant"
+
+        contacts:
+          type: array
+          items:
+            $ref: "#/components/schemas/SubmittedContact"
+
+        productSelections:
+          type: array
+          items:
+            $ref: "#/components/schemas/SubmittedProductSelection"
+
+        requirements:
+          $ref: "#/components/schemas/SubmittedRequirements"
+
+        documents:
+          type: array
+          nullable: true
+          items:
+            $ref: "#/components/schemas/SubmittedDocument"
+
+    ErrorResponse:
+      type: object
+      required:
+        - status
+        - message
+
+      properties:
+        status:
+          type: integer
+          description: HTTP status kod.
+          example: 400
+
+        message:
+          type: string
+          description: Opis nastale greške.
+          example: "Poslani podaci nisu ispravni."
+
+        traceId:
+          type: string
+          nullable: true
+          description: Identifikator zahtjeva za praćenje greške.
+          example: null

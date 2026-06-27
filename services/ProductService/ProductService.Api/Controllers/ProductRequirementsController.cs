@@ -92,7 +92,8 @@ public class ProductRequirementsController : ControllerBase
                 attributeCodes =
                     requirement.DependsOn.AttributeCodes
             },
-            displayOrder = requirement.DisplayOrder
+            displayOrder = requirement.DisplayOrder,
+            submitFieldName=requirement.SubmitFieldName
         };
     }
 }
