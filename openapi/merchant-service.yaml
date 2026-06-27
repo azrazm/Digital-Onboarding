@@ -18,6 +18,9 @@ tags:
   - name: Merchants
     description: Operacije nad merchantima
 
+  - name: Contacts
+    description: Operacije nad kontakt osobama merchanta
+
 paths:
   /api/v1/merchants/search:
     get:
@@ -129,21 +132,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/MerchantDetails"
-              example:
-                id: "13aa519f-2345-4e99-9fab-a3a83961e999"
-                merchantName: "Nova trgovina d.o.o."
-                merchantVat: "12345678901"
-                merchantCountry: "HR"
-                serviceCountry: "HR"
-                addressAndPostalCode: "Ilica 10, 10000 Zagreb"
-                industryCategory1: "Retail/FMCG"
-                industryCategory2: "Supermarkets"
-                industryCategory3: "General Supermarket"
-                merchantWebsite: "https://novatrgovina.hr"
-                merchantGroupName: null
-                merchantType: "B2C"
-                legalEntityIdentificationCode: null
-                yearlyRevenueInEur: "1.000.000 – 5.000.000 EUR"
 
         "400":
           description: Poslani podaci nisu ispravni.
@@ -158,10 +146,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-              example:
-                status: 409
-                message: "Merchant s istim poreznim identifikacijskim brojem već postoji."
-                traceId: null
 
         "500":
           description: Interna greška Merchant Servicea.
@@ -267,21 +251,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/MerchantDetails"
-              example:
-                id: "7d05319f-7b89-4e99-9fab-a3a83961e74d"
-                merchantName: "Monri Payments d.o.o."
-                merchantVat: "27746883608"
-                merchantCountry: "HR"
-                serviceCountry: "HR"
-                addressAndPostalCode: "Nova adresa 15, 10000 Zagreb"
-                industryCategory1: "Finance"
-                industryCategory2: "Banking"
-                industryCategory3: "Retail Banking"
-                merchantWebsite: "https://monri.hr"
-                merchantGroupName: "Payten"
-                merchantType: "B2B"
-                legalEntityIdentificationCode: "549300MONRI0000HR01"
-                yearlyRevenueInEur: "10.000.000 – 50.000.000 EUR"
 
         "400":
           description: Merchant ID ili poslani podaci nisu ispravni.
@@ -311,6 +280,173 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
 
+  /api/v1/merchants/{merchantId}/contacts:
+    get:
+      tags:
+        - Contacts
+      summary: Dohvati kontakte merchanta
+      description: >
+        Dohvaća sve kontakt osobe povezane s odabranim merchantom.
+      operationId: getMerchantContacts
+
+      parameters:
+        - $ref: "#/components/parameters/MerchantId"
+
+      responses:
+        "200":
+          description: Kontakti su uspješno dohvaćeni.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ContactListResponse"
+              example:
+                items:
+                  - id: "3e3a7c3a-0e7e-4df4-9184-f4ec7b510001"
+                    merchantId: "7d05319f-7b89-4e99-9fab-a3a83961e74d"
+                    firstName: "Ana"
+                    lastName: "Anić"
+                    email: "ana.anic@example.com"
+                    phoneNumber: "+385911234567"
+                    position: "Finance Manager"
+                    isDecisionMaker: true
+                    contactType: "Primary"
+                totalCount: 1
+
+        "400":
+          description: Merchant ID nije u ispravnom UUID formatu.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+        "404":
+          description: Merchant nije pronađen.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+        "500":
+          description: Interna greška Merchant Servicea.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+    put:
+      tags:
+        - Contacts
+      summary: Spasi kontakte merchanta
+      description: >
+        Sprema finalnu listu kontakt osoba za merchanta.
+        Ova ruta se koristi nakon submit-a onboarding prijave.
+        Poslana lista zamjenjuje prethodno spremljene kontakte za tog merchanta.
+      operationId: saveMerchantContacts
+
+      parameters:
+        - $ref: "#/components/parameters/MerchantId"
+
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SaveMerchantContactsRequest"
+            example:
+              contacts:
+                - firstName: "Ana"
+                  lastName: "Anić"
+                  email: "ana.anic@example.com"
+                  phoneNumber: "+385911234567"
+                  position: "Finance Manager"
+                  isDecisionMaker: true
+                  contactType: "Primary"
+                - firstName: "Marko"
+                  lastName: "Marković"
+                  email: "marko.markovic@example.com"
+                  phoneNumber: "+385921234567"
+                  position: "Operations Manager"
+                  isDecisionMaker: false
+                  contactType: "Secondary"
+
+      responses:
+        "200":
+          description: Kontakti su uspješno spremljeni.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ContactListResponse"
+
+        "400":
+          description: Merchant ID ili poslani podaci nisu ispravni.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+        "404":
+          description: Merchant nije pronađen.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+        "409":
+          description: Poslovno pravilo nije zadovoljeno, npr. nedostaje primarni kontakt ili postoje dupli emailovi.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+        "500":
+          description: Interna greška Merchant Servicea.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /api/v1/merchants/{merchantId}/contacts/{contactId}:
+    get:
+      tags:
+        - Contacts
+      summary: Dohvati jednu kontakt osobu
+      description: >
+        Dohvaća jednu kontakt osobu na osnovu ID-a merchanta i ID-a kontakta.
+      operationId: getMerchantContactById
+
+      parameters:
+        - $ref: "#/components/parameters/MerchantId"
+        - $ref: "#/components/parameters/ContactId"
+
+      responses:
+        "200":
+          description: Kontakt osoba je uspješno pronađena.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ContactDetails"
+
+        "400":
+          description: Merchant ID ili Contact ID nisu u ispravnom UUID formatu.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+        "404":
+          description: Merchant ili kontakt osoba nisu pronađeni.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+        "500":
+          description: Interna greška Merchant Servicea.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
 components:
   parameters:
     MerchantId:
@@ -322,6 +458,16 @@ components:
         type: string
         format: uuid
       example: "7d05319f-7b89-4e99-9fab-a3a83961e74d"
+
+    ContactId:
+      name: contactId
+      in: path
+      required: true
+      description: Interni identifikator kontakt osobe.
+      schema:
+        type: string
+        format: uuid
+      example: "3e3a7c3a-0e7e-4df4-9184-f4ec7b510001"
 
   schemas:
     CreateMerchantRequest:
@@ -567,6 +713,156 @@ components:
           type: string
           description: Raspon godišnjeg prihoda u EUR.
           example: "10.000.000 – 50.000.000 EUR"
+
+    SaveMerchantContactsRequest:
+      type: object
+      required:
+        - contacts
+
+      properties:
+        contacts:
+          type: array
+          minItems: 1
+          maxItems: 2
+          description: >
+            Finalna lista kontakt osoba za merchanta.
+            Očekuje se jedan primarni kontakt i opcionalno jedan sekundarni kontakt.
+          items:
+            $ref: "#/components/schemas/ContactInput"
+
+    ContactInput:
+      type: object
+      required:
+        - firstName
+        - lastName
+        - email
+        - phoneNumber
+        - contactType
+
+      properties:
+        firstName:
+          type: string
+          description: "Excel field: Contact Person Name"
+          example: "Ana"
+
+        lastName:
+          type: string
+          description: "Excel field: Contact Person Surname"
+          example: "Anić"
+
+        email:
+          type: string
+          format: email
+          description: "Excel field: Contact Person Email"
+          example: "ana.anic@example.com"
+
+        phoneNumber:
+          type: string
+          description: "Excel field: Contact Person Ph.Number"
+          example: "+385911234567"
+
+        position:
+          type: string
+          nullable: true
+          description: "Excel field: Position"
+          example: "Finance Manager"
+
+        isDecisionMaker:
+          type: boolean
+          nullable: true
+          description: "Excel field: Decision Maker"
+          example: true
+
+        contactType:
+          type: string
+          description: Tip kontakt osobe.
+          enum:
+            - Primary
+            - Secondary
+          example: "Primary"
+
+    ContactDetails:
+      type: object
+      required:
+        - id
+        - merchantId
+        - firstName
+        - lastName
+        - email
+        - phoneNumber
+        - contactType
+
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Interni identifikator kontakt osobe.
+          example: "3e3a7c3a-0e7e-4df4-9184-f4ec7b510001"
+
+        merchantId:
+          type: string
+          format: uuid
+          description: Interni identifikator merchanta kojem kontakt pripada.
+          example: "7d05319f-7b89-4e99-9fab-a3a83961e74d"
+
+        firstName:
+          type: string
+          description: Ime kontakt osobe.
+          example: "Ana"
+
+        lastName:
+          type: string
+          description: Prezime kontakt osobe.
+          example: "Anić"
+
+        email:
+          type: string
+          format: email
+          description: Email kontakt osobe.
+          example: "ana.anic@example.com"
+
+        phoneNumber:
+          type: string
+          description: Broj telefona kontakt osobe.
+          example: "+385911234567"
+
+        position:
+          type: string
+          nullable: true
+          description: Pozicija kontakt osobe.
+          example: "Finance Manager"
+
+        isDecisionMaker:
+          type: boolean
+          nullable: true
+          description: Označava da li je kontakt osoba donosilac odluke.
+          example: true
+
+        contactType:
+          type: string
+          description: Tip kontakt osobe.
+          enum:
+            - Primary
+            - Secondary
+          example: "Primary"
+
+    ContactListResponse:
+      type: object
+      required:
+        - items
+        - totalCount
+
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/ContactDetails"
+
+        totalCount:
+          type: integer
+          minimum: 0
+          description: Ukupan broj kontakt osoba za merchanta.
+          example: 1
 
     ErrorResponse:
       type: object

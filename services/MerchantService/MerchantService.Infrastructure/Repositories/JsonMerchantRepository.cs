@@ -1,6 +1,7 @@
 using System.Text.Json;
 using MerchantService.Application.Interfaces;
 using MerchantService.Domain.Entities;
+using System.Text.Json.Serialization;
 
 namespace MerchantService.Infrastructure.Repositories;
 
@@ -8,17 +9,20 @@ public sealed class JsonMerchantRepository : IMerchantRepository
 {
     private readonly string _filePath;
 
-    private readonly JsonSerializerOptions _jsonOptions = new()
-    {
-        PropertyNameCaseInsensitive = true,
-        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-        WriteIndented = true
-    };
-
     public JsonMerchantRepository(string filePath)
 {
     _filePath = filePath;
 }
+private readonly JsonSerializerOptions _jsonOptions = new()
+    {
+        PropertyNameCaseInsensitive = true,
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+        WriteIndented = true,
+        Converters =
+        {
+            new JsonStringEnumConverter()
+        }
+    };
 
     public async Task<IReadOnlyList<Merchant>> SearchAsync(
         string query,
@@ -127,4 +131,57 @@ public sealed class JsonMerchantRepository : IMerchantRepository
             merchants,
             _jsonOptions);
     }
+    public async Task<IReadOnlyList<Contact>?> GetContactsAsync(
+    Guid merchantId)
+{
+    var merchant = await GetByIdAsync(merchantId);
+
+    if (merchant is null)
+    {
+        return null;
+    }
+
+    return merchant.Contacts ?? new List<Contact>();
+}
+
+public async Task<Contact?> GetContactByIdAsync(
+    Guid merchantId,
+    Guid contactId)
+{
+    var merchant = await GetByIdAsync(merchantId);
+
+    if (merchant is null)
+    {
+        return null;
+    }
+
+    return merchant.Contacts?
+        .FirstOrDefault(contact => contact.Id == contactId);
+}
+
+public async Task<IReadOnlyList<Contact>?> SaveContactsAsync(
+    Guid merchantId,
+    IReadOnlyList<Contact> contacts)
+{
+    var merchants = await ReadAllAsync();
+
+    var merchant = merchants.FirstOrDefault(
+        existingMerchant => existingMerchant.Id == merchantId);
+
+    if (merchant is null)
+    {
+        return null;
+    }
+
+    foreach (var contact in contacts)
+    {
+        contact.MerchantId = merchantId;
+    }
+
+    merchant.Contacts = contacts.ToList();
+
+    await SaveAllAsync(merchants);
+
+    return merchant.Contacts;
+}
 }
