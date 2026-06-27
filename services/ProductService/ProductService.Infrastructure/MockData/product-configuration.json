@@ -1,0 +1,237 @@
+{
+  "productLines": [
+    {
+      "productLineCode": "WEBPAY",
+      "name": "WebPay",
+      "description": "Online payment solution.",
+      "requiresProductSelection": true,
+      "displayOrder": 1,
+      "status": "Active"
+    },
+    {
+      "productLineCode": "WSPAY",
+      "name": "WSPay",
+      "description": "Payment gateway solution.",
+      "requiresProductSelection": true,
+      "displayOrder": 2,
+      "status": "Active"
+    },
+    {
+      "productLineCode": "REMARIS",
+      "name": "Remaris",
+      "description": "Fiscalization and business solution.",
+      "requiresProductSelection": false,
+      "displayOrder": 3,
+      "status": "Active"
+    },
+    {
+      "productLineCode": "SMART",
+      "name": "Smart",
+      "description": "Smart POS related solution.",
+      "requiresProductSelection": false,
+      "displayOrder": 4,
+      "status": "Active"
+    },
+    {
+      "productLineCode": "THOR",
+      "name": "Thor",
+      "description": "Thor solution.",
+      "requiresProductSelection": false,
+      "displayOrder": 5,
+      "status": "Active"
+    },
+    {
+      "productLineCode": "START",
+      "name": "Start",
+      "description": "Start package.",
+      "requiresProductSelection": false,
+      "displayOrder": 6,
+      "status": "Active"
+    },
+    {
+      "productLineCode": "ATM",
+      "name": "ATM",
+      "description": "ATM related solution.",
+      "requiresProductSelection": false,
+      "displayOrder": 7,
+      "status": "Active"
+    }
+  ],
+  "products": [
+    {
+      "productCode": "WEBPAY_STANDARD",
+      "productLineCode": "WEBPAY",
+      "name": "WebPay Standard",
+      "description": "Standard WebPay product.",
+      "requiresAttributeSelection": true,
+      "displayOrder": 1,
+      "status": "Active"
+    },
+    {
+      "productCode": "WEBPAY_ADVANCED",
+      "productLineCode": "WEBPAY",
+      "name": "WebPay Advanced",
+      "description": "Advanced WebPay product.",
+      "requiresAttributeSelection": true,
+      "displayOrder": 2,
+      "status": "Active"
+    },
+    {
+      "productCode": "WSPAY_STANDARD",
+      "productLineCode": "WSPAY",
+      "name": "WSPay Standard",
+      "description": "Standard WSPay product.",
+      "requiresAttributeSelection": true,
+      "displayOrder": 1,
+      "status": "Active"
+    }
+  ],
+  "attributes": [
+    {
+      "attributeCode": "ONLINE_CARD_PAYMENTS",
+      "productCode": "WEBPAY_STANDARD",
+      "name": "Online card payments",
+      "description": "Card payment acceptance for online stores.",
+      "isRequired": false,
+      "displayOrder": 1,
+      "status": "Active"
+    },
+    {
+      "attributeCode": "TOKENIZATION",
+      "productCode": "WEBPAY_STANDARD",
+      "name": "Tokenization",
+      "description": "Card tokenization support.",
+      "isRequired": false,
+      "displayOrder": 2,
+      "status": "Active"
+    },
+    {
+      "attributeCode": "RECURRING_PAYMENTS",
+      "productCode": "WEBPAY_ADVANCED",
+      "name": "Recurring payments",
+      "description": "Support for recurring payment flows.",
+      "isRequired": false,
+      "displayOrder": 1,
+      "status": "Active"
+    },
+    {
+      "attributeCode": "WSPAY_GATEWAY",
+      "productCode": "WSPAY_STANDARD",
+      "name": "Gateway integration",
+      "description": "Gateway integration support.",
+      "isRequired": false,
+      "displayOrder": 1,
+      "status": "Active"
+    }
+  ],
+  "requirements": [
+    {
+      "requirementCode": "MONTHLY_TRANSACTION_VOLUME",
+      "label": "Expected monthly transaction volume",
+      "description": "Expected monthly transaction volume for selected products.",
+      "fieldType": "SingleSelect",
+      "isRequired": true,
+      "options": [
+        {
+          "code": "LOW",
+          "label": "Up to 10,000 EUR"
+        },
+        {
+          "code": "MEDIUM",
+          "label": "10,000 – 50,000 EUR"
+        },
+        {
+          "code": "HIGH",
+          "label": "More than 50,000 EUR"
+        }
+      ],
+      "dependsOn": {
+        "productLineCodes": [
+          "WEBPAY",
+          "WSPAY"
+        ],
+        "productCodes": [],
+        "attributeCodes": []
+      },
+      "displayOrder": 1
+    },
+    {
+      "requirementCode": "SUPPORTED_CURRENCIES",
+      "label": "Supported currencies",
+      "description": "Currencies required for the selected product setup.",
+      "fieldType": "MultiSelect",
+      "isRequired": true,
+      "options": [
+        {
+          "code": "EUR",
+          "label": "EUR"
+        },
+        {
+          "code": "USD",
+          "label": "USD"
+        },
+        {
+          "code": "BAM",
+          "label": "BAM"
+        }
+      ],
+      "dependsOn": {
+        "productLineCodes": [
+          "WEBPAY",
+          "WSPAY"
+        ],
+        "productCodes": [],
+        "attributeCodes": []
+      },
+      "displayOrder": 2
+    },
+    {
+      "requirementCode": "WEBSITE_URL",
+      "label": "Website URL",
+      "description": "Website URL used for online payments.",
+      "fieldType": "Text",
+      "isRequired": true,
+      "options": null,
+      "dependsOn": {
+        "productLineCodes": [
+          "WEBPAY"
+        ],
+        "productCodes": [],
+        "attributeCodes": []
+      },
+      "displayOrder": 3
+    },
+    {
+      "requirementCode": "TOKENIZATION_USAGE",
+      "label": "Tokenization usage",
+      "description": "Describe how tokenization will be used.",
+      "fieldType": "Text",
+      "isRequired": true,
+      "options": null,
+      "dependsOn": {
+        "productLineCodes": [],
+        "productCodes": [],
+        "attributeCodes": [
+          "TOKENIZATION"
+        ]
+      },
+      "displayOrder": 4
+    },
+    {
+      "requirementCode": "ATM_LOCATION_COUNT",
+      "label": "Number of ATM locations",
+      "description": "Number of ATM locations planned for onboarding.",
+      "fieldType": "Number",
+      "isRequired": true,
+      "options": null,
+      "dependsOn": {
+        "productLineCodes": [
+          "ATM"
+        ],
+        "productCodes": [],
+        "attributeCodes": []
+      },
+      "displayOrder": 5
+    }
+  ]
+}

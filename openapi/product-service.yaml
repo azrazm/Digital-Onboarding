@@ -1,0 +1,830 @@
+openapi: 3.0.3
+
+info:
+  title: Product Service API
+  description: >
+    API za dohvat product line-ova, proizvoda, atributa proizvoda
+    i konfiguracije zahtjeva koji se prikazuju tokom onboarding procesa.
+  version: 1.0.0
+
+servers:
+  - url: https://virtserver.swaggerhub.com/mon-7f4/product-service-api/1.0.0
+    description: SwaggerHub API Auto Mocking
+
+  - url: http://localhost:5001
+    description: Lokalno razvojno okruženje
+
+tags:
+  - name: Product Lines
+    description: Operacije nad product line konfiguracijom
+
+  - name: Products
+    description: Operacije nad proizvodima i atributima proizvoda
+
+  - name: Product Requirements
+    description: Operacije za određivanje zahtjeva na osnovu odabranih proizvoda
+
+paths:
+  /api/v1/product-lines:
+    get:
+      tags:
+        - Product Lines
+      summary: Dohvati product line-ove
+      description: >
+        Dohvaća listu dostupnih product line-ova za onboarding proces.
+        Merchant country se može poslati kao opcionalni kontekst, ali se
+        proizvodi trenutno ne filtriraju po državi.
+      operationId: getProductLines
+
+      parameters:
+        - name: merchantCountry
+          in: query
+          required: false
+          description: >
+            Opcionalni ISO kod države merchanta.
+            Trenutno se koristi samo kao kontekst, bez obaveznog filtriranja proizvoda.
+          schema:
+            type: string
+            minLength: 2
+            maxLength: 2
+          example: HR
+
+      responses:
+        "200":
+          description: Product line-ovi su uspješno dohvaćeni.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProductLineListResponse"
+              example:
+                items:
+                  - productLineCode: "WEBPAY"
+                    name: "WebPay"
+                    description: "Online payment solution."
+                    requiresProductSelection: true
+                    displayOrder: 1
+                    status: "Active"
+                  - productLineCode: "WSPAY"
+                    name: "WSPay"
+                    description: "Payment gateway solution."
+                    requiresProductSelection: true
+                    displayOrder: 2
+                    status: "Active"
+                  - productLineCode: "REMARIS"
+                    name: "Remaris"
+                    description: "Fiscalization and business solution."
+                    requiresProductSelection: false
+                    displayOrder: 3
+                    status: "Active"
+                  - productLineCode: "SMART"
+                    name: "Smart"
+                    description: "Smart POS related solution."
+                    requiresProductSelection: false
+                    displayOrder: 4
+                    status: "Active"
+                  - productLineCode: "THOR"
+                    name: "Thor"
+                    description: "Thor solution."
+                    requiresProductSelection: false
+                    displayOrder: 5
+                    status: "Active"
+                  - productLineCode: "START"
+                    name: "Start"
+                    description: "Start package."
+                    requiresProductSelection: false
+                    displayOrder: 6
+                    status: "Active"
+                  - productLineCode: "ATM"
+                    name: "ATM"
+                    description: "ATM related solution."
+                    requiresProductSelection: false
+                    displayOrder: 7
+                    status: "Active"
+                totalCount: 7
+
+        "400":
+          description: Neispravan opcionalni parametar.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+        "500":
+          description: Interna greška Product Servicea.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /api/v1/product-lines/{productLineCode}:
+    get:
+      tags:
+        - Product Lines
+      summary: Dohvati detalje product line-a
+      description: >
+        Dohvaća detalje jednog product line-a na osnovu njegovog koda.
+      operationId: getProductLineByCode
+
+      parameters:
+        - $ref: "#/components/parameters/ProductLineCode"
+
+      responses:
+        "200":
+          description: Product line je uspješno pronađen.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProductLineDetails"
+              example:
+                productLineCode: "WEBPAY"
+                name: "WebPay"
+                description: "Online payment solution."
+                requiresProductSelection: true
+                displayOrder: 1
+                status: "Active"
+
+        "404":
+          description: Product line nije pronađen.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+        "500":
+          description: Interna greška Product Servicea.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /api/v1/product-lines/{productLineCode}/products:
+    get:
+      tags:
+        - Products
+      summary: Dohvati proizvode za product line
+      description: >
+        Dohvaća proizvode koji pripadaju odabranom product line-u.
+        Ova ruta se koristi kada product line ima dodatni Product dropdown.
+      operationId: getProductsByProductLine
+
+      parameters:
+        - $ref: "#/components/parameters/ProductLineCode"
+
+      responses:
+        "200":
+          description: Proizvodi su uspješno dohvaćeni.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProductListResponse"
+              example:
+                items:
+                  - productCode: "WEBPAY_STANDARD"
+                    productLineCode: "WEBPAY"
+                    name: "WebPay Standard"
+                    description: "Standard WebPay product."
+                    requiresAttributeSelection: true
+                    displayOrder: 1
+                    status: "Active"
+                  - productCode: "WEBPAY_ADVANCED"
+                    productLineCode: "WEBPAY"
+                    name: "WebPay Advanced"
+                    description: "Advanced WebPay product."
+                    requiresAttributeSelection: true
+                    displayOrder: 2
+                    status: "Active"
+                totalCount: 2
+
+        "404":
+          description: Product line nije pronađen.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+        "500":
+          description: Interna greška Product Servicea.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /api/v1/products/{productCode}/attributes:
+    get:
+      tags:
+        - Products
+      summary: Dohvati atribute proizvoda
+      description: >
+        Dohvaća atribute koji se prikazuju nakon odabira određenog proizvoda.
+        Koristi se samo za proizvode koji imaju Product Attributes dropdown.
+      operationId: getProductAttributes
+
+      parameters:
+        - $ref: "#/components/parameters/ProductCode"
+
+      responses:
+        "200":
+          description: Atributi proizvoda su uspješno dohvaćeni.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProductAttributeListResponse"
+              example:
+                items:
+                  - attributeCode: "ONLINE_CARD_PAYMENTS"
+                    productCode: "WEBPAY_STANDARD"
+                    name: "Online card payments"
+                    description: "Card payment acceptance for online stores."
+                    isRequired: false
+                    displayOrder: 1
+                    status: "Active"
+                  - attributeCode: "TOKENIZATION"
+                    productCode: "WEBPAY_STANDARD"
+                    name: "Tokenization"
+                    description: "Card tokenization support."
+                    isRequired: false
+                    displayOrder: 2
+                    status: "Active"
+                totalCount: 2
+
+        "404":
+          description: Proizvod nije pronađen.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+        "500":
+          description: Interna greška Product Servicea.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /api/v1/product-requirements/resolve:
+    post:
+      tags:
+        - Product Requirements
+      summary: Odredi zahtjeve za odabrane proizvode
+      description: >
+        Na osnovu odabranih product line-ova, proizvoda i atributa vraća
+        listu zahtjeva/pitanja koja se prikazuju u onboarding formi.
+        Merchant country je opcionalni kontekst i kasnije se može koristiti
+        za dokumente ili tržišno specifična pravila.
+      operationId: resolveProductRequirements
+
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ResolveProductRequirementsRequest"
+            example:
+              merchantCountry: "HR"
+              selections:
+                - productLineCode: "WEBPAY"
+                  productCode: "WEBPAY_STANDARD"
+                  attributeCodes:
+                    - "ONLINE_CARD_PAYMENTS"
+                    - "TOKENIZATION"
+                - productLineCode: "ATM"
+                  productCode: null
+                  attributeCodes: []
+
+      responses:
+        "200":
+          description: Zahtjevi su uspješno određeni.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProductRequirementListResponse"
+              example:
+                items:
+                  - requirementCode: "MONTHLY_TRANSACTION_VOLUME"
+                    label: "Expected monthly transaction volume"
+                    description: "Expected monthly transaction volume for selected products."
+                    fieldType: "SingleSelect"
+                    isRequired: true
+                    options:
+                      - code: "LOW"
+                        label: "Up to 10,000 EUR"
+                      - code: "MEDIUM"
+                        label: "10,000 – 50,000 EUR"
+                      - code: "HIGH"
+                        label: "More than 50,000 EUR"
+                    dependsOn:
+                      productLineCodes:
+                        - "WEBPAY"
+                      productCodes:
+                        - "WEBPAY_STANDARD"
+                      attributeCodes: []
+                    displayOrder: 1
+                  - requirementCode: "SUPPORTED_CURRENCIES"
+                    label: "Supported currencies"
+                    description: "Currencies required for the selected product setup."
+                    fieldType: "MultiSelect"
+                    isRequired: true
+                    options:
+                      - code: "EUR"
+                        label: "EUR"
+                      - code: "USD"
+                        label: "USD"
+                      - code: "BAM"
+                        label: "BAM"
+                    dependsOn:
+                      productLineCodes:
+                        - "WEBPAY"
+                      productCodes: []
+                      attributeCodes: []
+                    displayOrder: 2
+                totalCount: 2
+
+        "400":
+          description: Poslani odabiri nisu ispravni.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+        "500":
+          description: Interna greška Product Servicea.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+components:
+  parameters:
+    ProductLineCode:
+      name: productLineCode
+      in: path
+      required: true
+      description: Jedinstveni kod product line-a.
+      schema:
+        type: string
+      example: "WEBPAY"
+
+    ProductCode:
+      name: productCode
+      in: path
+      required: true
+      description: Jedinstveni kod proizvoda.
+      schema:
+        type: string
+      example: "WEBPAY_STANDARD"
+
+  schemas:
+    ProductLineListResponse:
+      type: object
+      required:
+        - items
+        - totalCount
+
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/ProductLineSummary"
+
+        totalCount:
+          type: integer
+          minimum: 0
+          description: Ukupan broj product line-ova.
+          example: 7
+
+    ProductLineSummary:
+      type: object
+      required:
+        - productLineCode
+        - name
+        - requiresProductSelection
+        - displayOrder
+        - status
+
+      properties:
+        productLineCode:
+          type: string
+          description: Jedinstveni kod product line-a.
+          example: "WEBPAY"
+
+        name:
+          type: string
+          description: Naziv product line-a.
+          example: "WebPay"
+
+        description:
+          type: string
+          nullable: true
+          description: Kratki opis product line-a.
+          example: "Online payment solution."
+
+        requiresProductSelection:
+          type: boolean
+          description: >
+            Označava da li se nakon odabira product line-a mora izabrati
+            konkretan proizvod iz dodatnog Product dropdowna.
+          example: true
+
+        displayOrder:
+          type: integer
+          minimum: 1
+          description: Redoslijed prikaza u UI-u.
+          example: 1
+
+        status:
+          type: string
+          enum:
+            - Active
+            - Inactive
+          description: Status product line-a.
+          example: "Active"
+
+    ProductLineDetails:
+      type: object
+      required:
+        - productLineCode
+        - name
+        - requiresProductSelection
+        - displayOrder
+        - status
+
+      properties:
+        productLineCode:
+          type: string
+          description: Jedinstveni kod product line-a.
+          example: "WEBPAY"
+
+        name:
+          type: string
+          description: Naziv product line-a.
+          example: "WebPay"
+
+        description:
+          type: string
+          nullable: true
+          description: Detaljniji opis product line-a.
+          example: "Online payment solution."
+
+        requiresProductSelection:
+          type: boolean
+          description: Označava da li product line ima dodatni Product dropdown.
+          example: true
+
+        displayOrder:
+          type: integer
+          minimum: 1
+          description: Redoslijed prikaza u UI-u.
+          example: 1
+
+        status:
+          type: string
+          enum:
+            - Active
+            - Inactive
+          description: Status product line-a.
+          example: "Active"
+
+    ProductListResponse:
+      type: object
+      required:
+        - items
+        - totalCount
+
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/ProductSummary"
+
+        totalCount:
+          type: integer
+          minimum: 0
+          description: Ukupan broj proizvoda za product line.
+          example: 2
+
+    ProductSummary:
+      type: object
+      required:
+        - productCode
+        - productLineCode
+        - name
+        - requiresAttributeSelection
+        - displayOrder
+        - status
+
+      properties:
+        productCode:
+          type: string
+          description: Jedinstveni kod proizvoda.
+          example: "WEBPAY_STANDARD"
+
+        productLineCode:
+          type: string
+          description: Product line kojem proizvod pripada.
+          example: "WEBPAY"
+
+        name:
+          type: string
+          description: Naziv proizvoda.
+          example: "WebPay Standard"
+
+        description:
+          type: string
+          nullable: true
+          description: Kratki opis proizvoda.
+          example: "Standard WebPay product."
+
+        requiresAttributeSelection:
+          type: boolean
+          description: >
+            Označava da li se nakon odabira proizvoda mora izabrati
+            Product Attribute.
+          example: true
+
+        displayOrder:
+          type: integer
+          minimum: 1
+          description: Redoslijed prikaza u UI-u.
+          example: 1
+
+        status:
+          type: string
+          enum:
+            - Active
+            - Inactive
+          description: Status proizvoda.
+          example: "Active"
+
+    ProductAttributeListResponse:
+      type: object
+      required:
+        - items
+        - totalCount
+
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/ProductAttribute"
+
+        totalCount:
+          type: integer
+          minimum: 0
+          description: Ukupan broj atributa za proizvod.
+          example: 2
+
+    ProductAttribute:
+      type: object
+      required:
+        - attributeCode
+        - productCode
+        - name
+        - isRequired
+        - displayOrder
+        - status
+
+      properties:
+        attributeCode:
+          type: string
+          description: Jedinstveni kod atributa proizvoda.
+          example: "ONLINE_CARD_PAYMENTS"
+
+        productCode:
+          type: string
+          description: Proizvod kojem atribut pripada.
+          example: "WEBPAY_STANDARD"
+
+        name:
+          type: string
+          description: Naziv atributa.
+          example: "Online card payments"
+
+        description:
+          type: string
+          nullable: true
+          description: Kratki opis atributa.
+          example: "Card payment acceptance for online stores."
+
+        isRequired:
+          type: boolean
+          description: Označava da li je atribut obavezan.
+          example: false
+
+        displayOrder:
+          type: integer
+          minimum: 1
+          description: Redoslijed prikaza u UI-u.
+          example: 1
+
+        status:
+          type: string
+          enum:
+            - Active
+            - Inactive
+          description: Status atributa.
+          example: "Active"
+
+    ResolveProductRequirementsRequest:
+      type: object
+      required:
+        - selections
+
+      properties:
+        merchantCountry:
+          type: string
+          nullable: true
+          minLength: 2
+          maxLength: 2
+          description: >
+            Opcionalni ISO kod države merchanta.
+            Trenutno se ne koristi za filtriranje proizvoda.
+          example: "HR"
+
+        selections:
+          type: array
+          minItems: 1
+          description: Lista product line/proizvod/atribut odabira.
+          items:
+            $ref: "#/components/schemas/ProductSelection"
+
+    ProductSelection:
+      type: object
+      required:
+        - productLineCode
+        - attributeCodes
+
+      properties:
+        productLineCode:
+          type: string
+          description: Odabrani product line.
+          example: "WEBPAY"
+
+        productCode:
+          type: string
+          nullable: true
+          description: >
+            Odabrani proizvod. Može biti null ako product line nema
+            dodatni Product dropdown.
+          example: "WEBPAY_STANDARD"
+
+        attributeCodes:
+          type: array
+          description: >
+            Odabrani atributi proizvoda. Može biti prazna lista ako proizvod
+            nema Product Attributes dropdown.
+          items:
+            type: string
+          example:
+            - "ONLINE_CARD_PAYMENTS"
+            - "TOKENIZATION"
+
+    ProductRequirementListResponse:
+      type: object
+      required:
+        - items
+        - totalCount
+
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/ProductRequirement"
+
+        totalCount:
+          type: integer
+          minimum: 0
+          description: Ukupan broj zahtjeva.
+          example: 2
+
+    ProductRequirement:
+      type: object
+      required:
+        - requirementCode
+        - label
+        - fieldType
+        - isRequired
+        - dependsOn
+        - displayOrder
+
+      properties:
+        requirementCode:
+          type: string
+          description: Jedinstveni kod zahtjeva.
+          example: "MONTHLY_TRANSACTION_VOLUME"
+
+        label:
+          type: string
+          description: Tekst koji se prikazuje korisniku.
+          example: "Expected monthly transaction volume"
+
+        description:
+          type: string
+          nullable: true
+          description: Dodatno objašnjenje zahtjeva.
+          example: "Expected monthly transaction volume for selected products."
+
+        fieldType:
+          type: string
+          description: Tip UI polja.
+          enum:
+            - Text
+            - Number
+            - Boolean
+            - SingleSelect
+            - MultiSelect
+            - Date
+            - File
+          example: "SingleSelect"
+
+        isRequired:
+          type: boolean
+          description: Označava da li je zahtjev obavezan.
+          example: true
+
+        options:
+          type: array
+          nullable: true
+          description: Opcije za SingleSelect ili MultiSelect polja.
+          items:
+            $ref: "#/components/schemas/RequirementOption"
+
+        dependsOn:
+          $ref: "#/components/schemas/RequirementDependency"
+
+        displayOrder:
+          type: integer
+          minimum: 1
+          description: Redoslijed prikaza u UI-u.
+          example: 1
+
+    RequirementOption:
+      type: object
+      required:
+        - code
+        - label
+
+      properties:
+        code:
+          type: string
+          description: Kod opcije.
+          example: "LOW"
+
+        label:
+          type: string
+          description: Tekst opcije.
+          example: "Up to 10,000 EUR"
+
+    RequirementDependency:
+      type: object
+      required:
+        - productLineCodes
+        - productCodes
+        - attributeCodes
+
+      properties:
+        productLineCodes:
+          type: array
+          description: Product line-ovi na koje se zahtjev odnosi.
+          items:
+            type: string
+          example:
+            - "WEBPAY"
+
+        productCodes:
+          type: array
+          description: Proizvodi na koje se zahtjev odnosi.
+          items:
+            type: string
+          example:
+            - "WEBPAY_STANDARD"
+
+        attributeCodes:
+          type: array
+          description: Atributi na koje se zahtjev odnosi.
+          items:
+            type: string
+          example:
+            - "TOKENIZATION"
+
+    ErrorResponse:
+      type: object
+      required:
+        - status
+        - message
+
+      properties:
+        status:
+          type: integer
+          description: HTTP status kod.
+          example: 400
+
+        message:
+          type: string
+          description: Opis nastale greške.
+          example: "Poslani podaci nisu ispravni."
+
+        traceId:
+          type: string
+          nullable: true
+          description: Identifikator zahtjeva za praćenje greške.
+          example: null
