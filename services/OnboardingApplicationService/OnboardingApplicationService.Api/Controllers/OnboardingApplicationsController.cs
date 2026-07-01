@@ -121,6 +121,24 @@ public class OnboardingApplicationsController : ControllerBase
             MapApplicationDetails(application));
     }
 
+/*ruta vezana za internu logiku, da dobavimo sve submitane applications*/
+[HttpGet]
+[ProducesResponseType(StatusCodes.Status200OK)]
+public async Task<IActionResult> GetOnboardingApplications()
+{
+    var applications = await _repository.GetAllAsync();
+
+    var items = applications
+        .Select(MapApplicationSummary)
+        .ToList();
+
+    return Ok(new
+    {
+        items,
+        totalCount = items.Count
+    });
+}
+
     [HttpGet("{applicationId}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -293,4 +311,35 @@ public class OnboardingApplicationsController : ControllerBase
             documents = application.Documents
         };
     }
+
+    private static object MapApplicationSummary(
+    OnboardingApplication application)
+{
+    var primaryContact = application.Contacts.FirstOrDefault(
+        contact => string.Equals(
+            contact.ContactType,
+            "Primary",
+            StringComparison.OrdinalIgnoreCase));
+
+    var firstContact = primaryContact ?? application.Contacts.FirstOrDefault();
+
+    var productLineCodes = application.ProductSelections
+        .Select(selection => selection.ProductLineCode)
+        .Distinct()
+        .ToList();
+
+    return new
+    {
+        applicationId = application.ApplicationId,
+        applicationNumber = application.ApplicationNumber,
+        merchantName = application.Merchant.MerchantName,
+        merchantVat = application.Merchant.MerchantVat,
+        merchantCountry = application.Merchant.MerchantCountry,
+        submittedAt = application.SubmittedAt,
+        submittedByEmail = application.SubmittedByEmail,
+        primaryContactEmail = firstContact?.Email,
+        productLineCodes,
+        documentsCount = application.Documents.Count
+    };
+}
 }
