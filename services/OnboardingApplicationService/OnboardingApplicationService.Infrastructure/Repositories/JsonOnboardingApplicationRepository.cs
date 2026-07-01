@@ -21,6 +21,14 @@ public sealed class JsonOnboardingApplicationRepository
         _filePath = filePath;
     }
 
+public async Task<IReadOnlyList<OnboardingApplication>> GetAllAsync()
+{
+    var applications = await ReadAllAsync();
+
+    return applications
+        .OrderByDescending(application => application.SubmittedAt)
+        .ToList();
+}
     public async Task CreateAsync(OnboardingApplication application)
     {
         var applications = await ReadAllAsync();
