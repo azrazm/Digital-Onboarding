@@ -1,0 +1,16 @@
+[
+  {
+    "documentId": "b89643c4-f1fe-46c9-bc82-a1620891351f",
+    "documentReference": "COMPANY_REGISTRATION|DO-TEMP-ONB-001|b89643c4-f1fe-46c9-bc82-a1620891351f",
+    "ownerReference": "TEMP-ONB-001",
+    "customerId": "27746883608",
+    "documentType": "COMPANY_REGISTRATION",
+    "fileName": "company-registration.pdf",
+    "contentType": "application/pdf",
+    "source": "DigitalOnboarding",
+    "uploadStatus": "RECEIVED",
+    "uploadedAt": "2026-07-06T07:44:07.278678Z",
+    "dmsActionId": "010",
+    "dmsUniqueObjectId": "DO-TEMP-ONB-001"
+  }
+]

@@ -129,11 +129,14 @@ public class SubmittedRequirementsRequest
 
 public class SubmittedDocumentRequest
 {
+    public Guid? DocumentId { get; set; }
+
     [Required]
     public string DocumentType { get; set; } = string.Empty;
 
     [Required]
     public string FileName { get; set; } = string.Empty;
 
-    public string? DocumentReference { get; set; }
+    [Required]
+    public string DocumentReference { get; set; } = string.Empty;
 }

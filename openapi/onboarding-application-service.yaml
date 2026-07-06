@@ -9,7 +9,7 @@ info:
   version: 1.0.0
 
 servers:
-  - url: https://virtserver.swaggerhub.com/mon-7f4/onboarding-application-service-api/1.0.0
+  - url: https://virtserver.swaggerhub.com/mon-7f4/onboarding-application-service/1.0.0
     description: SwaggerHub API Auto Mocking
 
   - url: http://localhost:5002
@@ -95,7 +95,8 @@ paths:
                 gdpr: true
 
               documents:
-                - documentType: "COMPANY_REGISTRATION"
+                - documentId: "8f8d8c1f-7d3e-45ad-9e2f-0c1c0f2e0001"
+                  documentType: "COMPANY_REGISTRATION"
                   fileName: "company-registration.pdf"
                   documentReference: "mock-document-001"
 
@@ -164,7 +165,8 @@ paths:
                   mainBank: "Zagrebačka banka"
                   gdpr: true
                 documents:
-                  - documentType: "COMPANY_REGISTRATION"
+                  - documentId: "8f8d8c1f-7d3e-45ad-9e2f-0c1c0f2e0001"
+                    documentType: "COMPANY_REGISTRATION"
                     fileName: "company-registration.pdf"
                     documentReference: "mock-document-001"
 
@@ -560,8 +562,16 @@ components:
       required:
         - documentType
         - fileName
+        - documentReference
 
       properties:
+        documentId:
+          type: string
+          format: uuid
+          nullable: true
+          description: Interni ID dokumenta iz Document Servicea.
+          example: "8f8d8c1f-7d3e-45ad-9e2f-0c1c0f2e0001"
+
         documentType:
           type: string
           description: Tip dokumenta.
@@ -574,10 +584,10 @@ components:
 
         documentReference:
           type: string
-          nullable: true
           description: >
-            Referenca na dokument u Document Serviceu, DMS-u ili mock storageu.
-          example: "mock-document-001"
+            Referenca dokumenta koju je vratio Document Service.
+            Trenutno je samo mock DMS referenca, a kasnije će biti stvarni DMS document ID.
+          example: "COMPANY_REGISTRATION|DO-TEMP-ONB-001|8f8d8c1f-7d3e-45ad-9e2f-0c1c0f2e0001"
 
     OnboardingApplicationDetails:
       type: object

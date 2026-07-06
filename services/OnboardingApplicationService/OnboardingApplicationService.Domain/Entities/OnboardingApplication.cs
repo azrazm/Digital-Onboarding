@@ -109,9 +109,11 @@ public class SubmittedRequirements
 
 public class SubmittedDocument
 {
+    public Guid? DocumentId { get; set; } /*ovo ce mu vratiti Document Service*/
+
     public string DocumentType { get; set; } = string.Empty;
 
     public string FileName { get; set; } = string.Empty;
 
-    public string? DocumentReference { get; set; }
+    public string DocumentReference { get; set; } = string.Empty;
 }

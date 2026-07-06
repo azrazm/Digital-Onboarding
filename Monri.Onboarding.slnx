@@ -1,5 +1,11 @@
 <Solution>
   <Folder Name="/services/" />
+  <Folder Name="/services/DocumentService/">
+    <Project Path="services/DocumentService/DocumentService.Api/DocumentService.Api.csproj" />
+    <Project Path="services/DocumentService/DocumentService.Application/DocumentService.Application.csproj" />
+    <Project Path="services/DocumentService/DocumentService.Domain/DocumentService.Domain.csproj" />
+    <Project Path="services/DocumentService/DocumentService.Infrastructure/DocumentService.Infrastructure.csproj" />
+  </Folder>
   <Folder Name="/services/MerchantService/">
     <Project Path="services/MerchantService/MerchantService.Api/MerchantService.Api.csproj" />
     <Project Path="services/MerchantService/MerchantService.Application/MerchantService.Application.csproj" />
