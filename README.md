@@ -15,3 +15,7 @@ dotnet run \
 dotnet run \
   --project services/OnboardingApplicationService/OnboardingApplicationService.Api \
   --urls "http://localhost:5002"
+
+dotnet run \
+  --project services/DocumentService/DocumentService.Api \
+  --urls "http://localhost:5003"
