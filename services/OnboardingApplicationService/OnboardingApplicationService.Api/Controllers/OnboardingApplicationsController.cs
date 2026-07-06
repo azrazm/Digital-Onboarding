@@ -267,18 +267,19 @@ public async Task<IActionResult> GetOnboardingApplications()
     }
 
     private static SubmittedDocument MapDocument(
-        SubmittedDocumentRequest document)
+    SubmittedDocumentRequest document)
+{
+    return new SubmittedDocument
     {
-        return new SubmittedDocument
-        {
-            DocumentType =
-                document.DocumentType.Trim().ToUpperInvariant(),
-            FileName =
-                document.FileName.Trim(),
-            DocumentReference =
-                document.DocumentReference?.Trim()
-        };
-    }
+        DocumentId = document.DocumentId,
+        DocumentType =
+            document.DocumentType.Trim().ToUpperInvariant(),
+        FileName =
+            document.FileName.Trim(),
+        DocumentReference =
+            document.DocumentReference.Trim()
+    };
+}
 
     private static string NormalizeContactType(string contactType)
     {

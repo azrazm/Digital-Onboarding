@@ -72,9 +72,90 @@
     },
     "documents": [
       {
+        "documentId": null,
         "documentType": "COMPANY_REGISTRATION",
         "fileName": "company-registration.pdf",
         "documentReference": "mock-document-001"
+      }
+    ]
+  },
+  {
+    "applicationId": "faef5a8e-1c6a-4c0f-a134-6a2a3da8457f",
+    "applicationNumber": "ONB-2026-000002",
+    "submittedAt": "2026-07-06T08:20:41.164981Z",
+    "lastUpdatedAt": "2026-07-06T08:20:41.164981Z",
+    "submittedByEmail": "user@example.com",
+    "confirmedReview": true,
+    "merchant": {
+      "existingMerchantId": "7d05319f-7b89-4e99-9fab-a3a83961e74d",
+      "merchantName": "Monri Payments d.o.o.",
+      "merchantVat": "27746883608",
+      "merchantCountry": "HR",
+      "serviceCountry": "HR",
+      "addressAndPostalCode": "Bani 75, 10010 Zagreb",
+      "industryCategory1": "Finance",
+      "industryCategory2": "Banking",
+      "industryCategory3": "Retail Banking",
+      "merchantWebsite": "https://monri.hr",
+      "merchantGroupName": "Payten",
+      "merchantType": "B2B",
+      "legalEntityIdentificationCode": "549300MONRI0000HR01",
+      "yearlyRevenueInEur": "10.000.000 \u2013 50.000.000 EUR"
+    },
+    "contacts": [
+      {
+        "firstName": "Ana",
+        "lastName": "Ani\u0107",
+        "email": "ana.anic@example.com",
+        "phoneNumber": "\u002B385911234567",
+        "position": "Finance Manager",
+        "isDecisionMaker": true,
+        "contactType": "Primary"
+      },
+      {
+        "firstName": "Marko",
+        "lastName": "Markovi\u0107",
+        "email": "marko.markovic@example.com",
+        "phoneNumber": "\u002B385921234567",
+        "position": "Operations Manager",
+        "isDecisionMaker": false,
+        "contactType": "Secondary"
+      }
+    ],
+    "productSelections": [
+      {
+        "productLineCode": "WEBPAY",
+        "productCode": "WEBPAY_STANDARD",
+        "attributeCodes": [
+          "ONLINE_CARD_PAYMENTS",
+          "TOKENIZATION"
+        ]
+      },
+      {
+        "productLineCode": "ATM",
+        "productCode": null,
+        "attributeCodes": []
+      }
+    ],
+    "requirements": {
+      "yearlyCardTransactionNumber": 12000,
+      "yearlyCardTransactionVolumeInEur": 50000,
+      "partnersAndDistributors": "Partner A, Partner B",
+      "integratorsAndSystemProviders": "Integrator X",
+      "numberOfLocations": 5,
+      "numberOfDevices": 20,
+      "numberOfLicensesPaid": 10,
+      "numberOfLicensesTotal": 15,
+      "modelOfDeviceHw": "PAX A920",
+      "mainBank": "Zagreba\u010Dka banka",
+      "gdpr": true
+    },
+    "documents": [
+      {
+        "documentId": "8f8d8c1f-7d3e-45ad-9e2f-0c1c0f2e0001",
+        "documentType": "COMPANY_REGISTRATION",
+        "fileName": "company-registration.pdf",
+        "documentReference": "COMPANY_REGISTRATION|DO-TEMP-ONB-001|8f8d8c1f-7d3e-45ad-9e2f-0c1c0f2e0001"
       }
     ]
   }
