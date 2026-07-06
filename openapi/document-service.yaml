@@ -1,0 +1,341 @@
+openapi: 3.0.3
+
+info:
+  title: Document Service API
+  description: >
+    API za upload dokumenata i dohvat metapodataka dokumenata.
+    Servis je zamišljen kao DMS adapter boundary. U trenutnom prototipu
+    ne poziva pravi DMS, nego generiše mock DMS reference. Kasnije se
+    mock DMS klijent može zamijeniti pravom DMS integracijom.
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:5003
+    description: Lokalno razvojno okruženje
+
+tags:
+  - name: Documents
+    description: Operacije za upload i dohvat dokumenata
+
+paths:
+  /api/v1/documents/upload:
+    post:
+      tags:
+        - Documents
+      summary: Upload dokumenta
+      description: >
+        Prima dokument kao base64 string, validira osnovne podatke i vraća
+        documentReference. U trenutnom prototipu documentReference je mock DMS
+        referenca. Frontend kasnije šalje ovu referencu u Onboarding Application
+        Service prilikom finalnog submit-a.
+      operationId: uploadDocument
+
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UploadDocumentRequest"
+            example:
+              ownerReference: "TEMP-ONB-001"
+              customerId: "27746883608"
+              documentType: "COMPANY_REGISTRATION"
+              fileName: "company-registration.pdf"
+              contentType: "application/pdf"
+              base64Content: "JVBERi0xLjQK"
+              source: "DigitalOnboarding"
+
+      responses:
+        "201":
+          description: Dokument je uspješno zaprimljen.
+          headers:
+            Location:
+              description: URL zaprimljenog dokumenta.
+              schema:
+                type: string
+                example: "/api/v1/documents/8f8d8c1f-7d3e-45ad-9e2f-0c1c0f2e0001"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DocumentDetails"
+              example:
+                documentId: "8f8d8c1f-7d3e-45ad-9e2f-0c1c0f2e0001"
+                documentReference: "COMPANY_REGISTRATION|DO-TEMP-ONB-001|8f8d8c1f-7d3e-45ad-9e2f-0c1c0f2e0001"
+                ownerReference: "TEMP-ONB-001"
+                customerId: "27746883608"
+                documentType: "COMPANY_REGISTRATION"
+                fileName: "company-registration.pdf"
+                contentType: "application/pdf"
+                source: "DigitalOnboarding"
+                uploadStatus: "RECEIVED"
+                uploadedAt: "2026-06-27T12:30:00Z"
+                dmsActionId: "010"
+                dmsUniqueObjectId: "DO-TEMP-ONB-001"
+
+        "400":
+          description: Poslani podaci nisu ispravni.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                invalidContentType:
+                  summary: Neispravan content type
+                  value:
+                    status: 400
+                    message: "ContentType mora biti application/pdf, image/png ili image/jpeg."
+                    traceId: null
+                invalidBase64:
+                  summary: Neispravan base64 sadržaj
+                  value:
+                    status: 400
+                    message: "Base64Content nije validan base64 string."
+                    traceId: null
+                fileTooLarge:
+                  summary: Dokument je prevelik
+                  value:
+                    status: 400
+                    message: "Dokument ne smije biti veći od 10 MB."
+                    traceId: null
+
+        "500":
+          description: Interna greška Document Servicea.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /api/v1/documents/{documentId}:
+    get:
+      tags:
+        - Documents
+      summary: Dohvati dokument metadata
+      description: >
+        Dohvaća metapodatke dokumenta na osnovu internog documentId.
+        Ova ruta ne vraća fizički sadržaj dokumenta, nego samo metadata
+        i documentReference.
+      operationId: getDocumentById
+
+      parameters:
+        - $ref: "#/components/parameters/DocumentId"
+
+      responses:
+        "200":
+          description: Dokument je uspješno pronađen.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DocumentDetails"
+
+        "400":
+          description: Document ID nije u ispravnom UUID formatu.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              example:
+                status: 400
+                message: "Document ID nije u ispravnom UUID formatu."
+                traceId: null
+
+        "404":
+          description: Dokument nije pronađen.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              example:
+                status: 404
+                message: "Dokument nije pronađen."
+                traceId: null
+
+        "500":
+          description: Interna greška Document Servicea.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+components:
+  parameters:
+    DocumentId:
+      name: documentId
+      in: path
+      required: true
+      description: Interni identifikator dokumenta.
+      schema:
+        type: string
+        format: uuid
+      example: "8f8d8c1f-7d3e-45ad-9e2f-0c1c0f2e0001"
+
+  schemas:
+    UploadDocumentRequest:
+      type: object
+      required:
+        - ownerReference
+        - customerId
+        - documentType
+        - fileName
+        - contentType
+        - base64Content
+
+      properties:
+        ownerReference:
+          type: string
+          description: >
+            Privremena ili poslovna referenca onboarding procesa.
+            Pošto applicationId još ne postoji prije finalnog submit-a,
+            frontend može poslati privremeni ownerReference.
+          example: "TEMP-ONB-001"
+
+        customerId:
+          type: string
+          description: >
+            Identifikator kupca/merchanta. U trenutnom prototipu može biti
+            merchant VAT ili drugi poznati identifikator.
+          example: "27746883608"
+
+        documentType:
+          type: string
+          description: Tip dokumenta koji se šalje prema DMS-u.
+          example: "COMPANY_REGISTRATION"
+
+        fileName:
+          type: string
+          description: Originalni naziv fajla.
+          example: "company-registration.pdf"
+
+        contentType:
+          type: string
+          description: MIME tip dokumenta.
+          enum:
+            - application/pdf
+            - image/png
+            - image/jpeg
+          example: "application/pdf"
+
+        base64Content:
+          type: string
+          format: byte
+          description: >
+            Sadržaj dokumenta kodiran kao base64 string.
+            Trenutno se koristi za mock upload; u produkciji bi se sadržaj
+            proslijedio prema DMS integraciji.
+          example: "JVBERi0xLjQK"
+
+        source:
+          type: string
+          nullable: true
+          description: Izvor dokumenta.
+          default: "DigitalOnboarding"
+          example: "DigitalOnboarding"
+
+    DocumentDetails:
+      type: object
+      required:
+        - documentId
+        - documentReference
+        - ownerReference
+        - customerId
+        - documentType
+        - fileName
+        - contentType
+        - source
+        - uploadStatus
+        - uploadedAt
+
+      properties:
+        documentId:
+          type: string
+          format: uuid
+          description: Interni identifikator dokumenta u Document Serviceu.
+          example: "8f8d8c1f-7d3e-45ad-9e2f-0c1c0f2e0001"
+
+        documentReference:
+          type: string
+          description: >
+            Referenca dokumenta koju frontend šalje u Onboarding Application
+            Service. U prototipu je mock DMS referenca, a kasnije bi bila
+            stvarni DMS document ID/reference.
+          example: "COMPANY_REGISTRATION|DO-TEMP-ONB-001|8f8d8c1f-7d3e-45ad-9e2f-0c1c0f2e0001"
+
+        ownerReference:
+          type: string
+          description: Referenca onboarding procesa ili privremena frontend referenca.
+          example: "TEMP-ONB-001"
+
+        customerId:
+          type: string
+          description: Identifikator merchanta/kupca.
+          example: "27746883608"
+
+        documentType:
+          type: string
+          description: Tip dokumenta.
+          example: "COMPANY_REGISTRATION"
+
+        fileName:
+          type: string
+          description: Originalni naziv fajla.
+          example: "company-registration.pdf"
+
+        contentType:
+          type: string
+          description: MIME tip dokumenta.
+          example: "application/pdf"
+
+        source:
+          type: string
+          description: Izvor dokumenta.
+          example: "DigitalOnboarding"
+
+        uploadStatus:
+          type: string
+          description: Status zaprimanja dokumenta.
+          enum:
+            - PENDING
+            - RECEIVED
+            - FAILED
+          example: "RECEIVED"
+
+        uploadedAt:
+          type: string
+          format: date-time
+          description: Vrijeme upload-a dokumenta.
+          example: "2026-06-27T12:30:00Z"
+
+        dmsActionId:
+          type: string
+          nullable: true
+          description: DMS action ID. U mock verziji koristi se vrijednost iz konfiguracije.
+          example: "010"
+
+        dmsUniqueObjectId:
+          type: string
+          nullable: true
+          description: >
+            Unique object ID koji bi se koristio pri slanju dokumenta prema DMS-u.
+          example: "DO-TEMP-ONB-001"
+
+    ErrorResponse:
+      type: object
+      required:
+        - status
+        - message
+
+      properties:
+        status:
+          type: integer
+          description: HTTP status kod.
+          example: 400
+
+        message:
+          type: string
+          description: Opis greške.
+          example: "Poslani podaci nisu ispravni."
+
+        traceId:
+          type: string
+          nullable: true
+          description: Identifikator zahtjeva za praćenje greške.
+          example: null
