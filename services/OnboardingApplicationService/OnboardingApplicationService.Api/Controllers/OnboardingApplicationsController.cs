@@ -34,54 +34,12 @@ public class OnboardingApplicationsController : ControllerBase
             });
         }
 
-        var duplicateEmails = request.Contacts
-            .GroupBy(contact => contact.Email.Trim().ToLowerInvariant())
-            .Any(group => group.Count() > 1);
-
-        if (duplicateEmails)
-        {
-            return Conflict(new
-            {
-                status = 409,
-                message = "Kontakt osobe ne mogu imati isti email.",
-                traceId = HttpContext.TraceIdentifier
-            });
-        }
-
-        var primaryContactsCount = request.Contacts.Count(
-            contact => string.Equals(
-                contact.ContactType.Trim(),
-                "Primary",
-                StringComparison.OrdinalIgnoreCase));
-
-        if (primaryContactsCount != 1)
-        {
-            return Conflict(new
-            {
-                status = 409,
-                message = "Mora postojati tačno jedan primarni kontakt.",
-                traceId = HttpContext.TraceIdentifier
-            });
-        }
-
-        var hasInvalidContactType = request.Contacts.Any(
-            contact =>
-                !string.Equals(
-                    contact.ContactType.Trim(),
-                    "Primary",
-                    StringComparison.OrdinalIgnoreCase)
-                &&
-                !string.Equals(
-                    contact.ContactType.Trim(),
-                    "Secondary",
-                    StringComparison.OrdinalIgnoreCase));
-
-        if (hasInvalidContactType)
+        if (request.Contacts.Count != 1)
         {
             return BadRequest(new
             {
                 status = 400,
-                message = "ContactType mora biti Primary ili Secondary.",
+                message = "Mora biti tačno jedan kontakt.",
                 traceId = HttpContext.TraceIdentifier
             });
         }
@@ -216,7 +174,7 @@ public async Task<IActionResult> GetOnboardingApplications()
             PhoneNumber = contact.PhoneNumber.Trim(),
             Position = contact.Position?.Trim(),
             IsDecisionMaker = contact.IsDecisionMaker,
-            ContactType = NormalizeContactType(contact.ContactType)
+            ContactType = "Primary"
         };
     }
 
@@ -281,19 +239,6 @@ public async Task<IActionResult> GetOnboardingApplications()
     };
 }
 
-    private static string NormalizeContactType(string contactType)
-    {
-        if (string.Equals(
-                contactType.Trim(),
-                "Primary",
-                StringComparison.OrdinalIgnoreCase))
-        {
-            return "Primary";
-        }
-
-        return "Secondary";
-    }
-
     private static object MapApplicationDetails(
         OnboardingApplication application)
     {
@@ -316,13 +261,7 @@ public async Task<IActionResult> GetOnboardingApplications()
     private static object MapApplicationSummary(
     OnboardingApplication application)
 {
-    var primaryContact = application.Contacts.FirstOrDefault(
-        contact => string.Equals(
-            contact.ContactType,
-            "Primary",
-            StringComparison.OrdinalIgnoreCase));
-
-    var firstContact = primaryContact ?? application.Contacts.FirstOrDefault();
+    var firstContact = application.Contacts.FirstOrDefault();
 
     var productLineCodes = application.ProductSelections
         .Select(selection => selection.ProductLineCode)

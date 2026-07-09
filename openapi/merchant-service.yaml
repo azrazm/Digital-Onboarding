@@ -362,7 +362,7 @@ paths:
                   isDecisionMaker: true
                   contactType: "Primary"
 
-      responses:
+      responses:git add 
         "200":
           description: Kontakti su uspješno spremljeni.
           content:
