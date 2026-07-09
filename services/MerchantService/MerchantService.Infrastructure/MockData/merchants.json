@@ -15,29 +15,18 @@
     "legalEntityIdentificationCode": "549300MONRI0000HR01",
     "yearlyRevenueInEur": "10.000.000 \u2013 50.000.000 EUR",
     "contacts": [
-  {
-    "id": "3e3a7c3a-0e7e-4df4-9184-f4ec7b510001",
-    "merchantId": "7d05319f-7b89-4e99-9fab-a3a83961e74d",
-    "firstName": "Ana",
-    "lastName": "Anić",
-    "email": "ana.anic@example.com",
-    "phoneNumber": "+385911234567",
-    "position": "Finance Manager",
-    "isDecisionMaker": true,
-    "contactType": "Primary"
-  },
-  {
-    "id": "6a2c0f2d-64e6-4a4b-9c41-b05b7a210002",
-    "merchantId": "7d05319f-7b89-4e99-9fab-a3a83961e74d",
-    "firstName": "Marko",
-    "lastName": "Marković",
-    "email": "marko.markovic@example.com",
-    "phoneNumber": "+385921234567",
-    "position": "Operations Manager",
-    "isDecisionMaker": false,
-    "contactType": "Secondary"
-  }
-]
+      {
+        "id": "5ffafbf2-a6f2-46dd-8d1f-f3a8a9196416",
+        "merchantId": "7d05319f-7b89-4e99-9fab-a3a83961e74d",
+        "firstName": "Marko",
+        "lastName": "Markovi\u0107",
+        "email": "marko.markovic@example.com",
+        "phoneNumber": "\u002B385921234567",
+        "position": "Operations Manager",
+        "isDecisionMaker": false,
+        "merchant": null
+      }
+    ]
   },
   {
     "id": "94f74511-2648-47c4-8529-42cf14e80120",

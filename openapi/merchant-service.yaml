@@ -361,13 +361,6 @@ paths:
                   position: "Finance Manager"
                   isDecisionMaker: true
                   contactType: "Primary"
-                - firstName: "Marko"
-                  lastName: "Marković"
-                  email: "marko.markovic@example.com"
-                  phoneNumber: "+385921234567"
-                  position: "Operations Manager"
-                  isDecisionMaker: false
-                  contactType: "Secondary"
 
       responses:
         "200":
@@ -723,10 +716,10 @@ components:
         contacts:
           type: array
           minItems: 1
-          maxItems: 2
+          maxItems: 1
           description: >
             Finalna lista kontakt osoba za merchanta.
-            Očekuje se jedan primarni kontakt i opcionalno jedan sekundarni kontakt.
+            Očekuje se jedan primarni kontakt.
           items:
             $ref: "#/components/schemas/ContactInput"
 
@@ -778,7 +771,6 @@ components:
           description: Tip kontakt osobe.
           enum:
             - Primary
-            - Secondary
           example: "Primary"
 
     ContactDetails:
@@ -843,7 +835,6 @@ components:
           description: Tip kontakt osobe.
           enum:
             - Primary
-            - Secondary
           example: "Primary"
 
     ContactListResponse:

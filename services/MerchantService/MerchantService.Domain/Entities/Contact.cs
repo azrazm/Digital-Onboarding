@@ -1,5 +1,3 @@
-using MerchantService.Domain.Enums;
-
 namespace MerchantService.Domain.Entities;
 
 public class Contact
@@ -39,13 +37,6 @@ public class Contact
     // false = Ne
     // null  = Nije odabrano
     public bool? IsDecisionMaker { get; set; }
-
-    // Povezano s Excel field: Secondary Contact
-    // Field type: Optional
-    //
-    // Primary označava glavnu kontaktnu osobu.
-    // Secondary označava sekundarnu kontaktnu osobu.
-    public ContactType ContactType { get; set; }
 
     // Navigacijska veza prema Merchant entitetu.
     // Nije direktno Excel polje.

@@ -1,7 +1,6 @@
 using MerchantService.Api.Models.Requests;
 using MerchantService.Application.Interfaces;
 using MerchantService.Domain.Entities;
-using MerchantService.Domain.Enums;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MerchantService.Api.Controllers;
@@ -137,38 +136,11 @@ public class ContactsController : ControllerBase
             });
         }
 
-        var hasDuplicateEmails = request.Contacts
-            .GroupBy(contact =>
-                contact.Email.Trim().ToLowerInvariant())
-            .Any(group => group.Count() > 1);
-
-        if (hasDuplicateEmails)
-        {
-            return Conflict(new
-            {
-                status = 409,
-                message = "Kontakt osobe ne mogu imati isti email.",
-                traceId = HttpContext.TraceIdentifier
-            });
-        }
 
         var domainContacts = new List<Contact>();
 
         foreach (var contactRequest in request.Contacts)
         {
-            if (!Enum.TryParse<ContactType>(
-                    contactRequest.ContactType,
-                    ignoreCase: true,
-                    out var parsedContactType))
-            {
-                return BadRequest(new
-                {
-                    status = 400,
-                    message = "ContactType mora biti Primary ili Secondary.",
-                    traceId = HttpContext.TraceIdentifier
-                });
-            }
-
             domainContacts.Add(new Contact
             {
                 Id = Guid.NewGuid(),
@@ -178,21 +150,7 @@ public class ContactsController : ControllerBase
                 Email = contactRequest.Email.Trim(),
                 PhoneNumber = contactRequest.PhoneNumber.Trim(),
                 Position = contactRequest.Position?.Trim(),
-                IsDecisionMaker = contactRequest.IsDecisionMaker,
-                ContactType = parsedContactType
-            });
-        }
-
-        var primaryContactsCount = domainContacts.Count(
-            contact => contact.ContactType == ContactType.Primary);
-
-        if (primaryContactsCount != 1)
-        {
-            return Conflict(new
-            {
-                status = 409,
-                message = "Mora postojati tačno jedan primarni kontakt.",
-                traceId = HttpContext.TraceIdentifier
+                IsDecisionMaker = contactRequest.IsDecisionMaker
             });
         }
 
@@ -233,8 +191,7 @@ public class ContactsController : ControllerBase
             email = contact.Email,
             phoneNumber = contact.PhoneNumber,
             position = contact.Position,
-            isDecisionMaker = contact.IsDecisionMaker,
-            contactType = contact.ContactType.ToString()
+            isDecisionMaker = contact.IsDecisionMaker
         };
     }
 }

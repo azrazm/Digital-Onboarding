@@ -6,7 +6,7 @@ public class SaveMerchantContactsRequest
 {
     [Required]
     [MinLength(1)]
-    [MaxLength(2)]
+    [MaxLength(1)]
     public List<ContactInputRequest> Contacts { get; set; } = new();
 }
 
@@ -33,7 +33,4 @@ public class ContactInputRequest
     public string? Position { get; set; }
 
     public bool? IsDecisionMaker { get; set; }
-
-    [Required]
-    public string ContactType { get; set; } = string.Empty;
 }
